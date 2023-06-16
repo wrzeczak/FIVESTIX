@@ -1,11 +1,7 @@
 TARGET := app
 
 SOURCES := $(wildcard src/*.c) $(wildcard src/*.cpp)
-<<<<<<< HEAD
 LIBS := -L"C:\\vcpkg\\packages\\raylib_x64-windows\\bin" -lraylib
-=======
-LIBS := -L"C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\" -lraylib -lGL -lglut -lGLEW -lglfw -lX11 -lXi -lXrandr -lm
->>>>>>> 264075d67b234216e1b5c5b9afbe29a6450acd8e
 OBJECTS := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCES)))
 DEPENDS := $(patsubst %.c,%.d,$(patsubst %.cpp,%.d,$(SOURCES)))
 
