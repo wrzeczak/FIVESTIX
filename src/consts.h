@@ -1,7 +1,7 @@
 #include "raylib.h"
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
+#define SCREEN_WIDTH GetMonitorWidth(GetCurrentMonitor())
+#define SCREEN_HEIGHT GetMonitorHeight(GetCurrentMonitor())
 
 // Either X_PIXELS_COUNT or Y_PIXELS_COUNT should be kept a multiple of 64 so as to keep the color arrays aligned to 64 bytes
 

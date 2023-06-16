@@ -2,7 +2,7 @@
 
 #define SUPPORT_MODULE_RTEXTURES
 #define SUPPORT_IMAGE_GENERATION
-#define EX
+
 #include "ecs.h"
 #include "board.h"
 #include "consts.h"
@@ -34,7 +34,8 @@ int main(void) {
 
     ToggleFullscreen();
 
-    SetTargetFPS(75);
+    // enable vsync
+    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     // TODO: Load this without discarding a bunch of stuff
     Texture2D board_texture = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT).texture;
@@ -44,9 +45,9 @@ int main(void) {
 
     Image perlin_noise_image;
 
-    perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
+    // perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
 
-    Texture2D noise = LoadTextureFromImage(perlin_noise_image);
+    // Texture2D noise = LoadTextureFromImage(perlin_noise_image);
 
     init_map();
 
