@@ -46,6 +46,8 @@ int main(void) {
 
     Image perlin_noise_image;
 
+    // TODO: Make our own perlin noise algorithm or use another library, as this uses the heap along with not being able to set a seed
+    // NOTE: This uses the heap
     perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
     Texture2D noise = LoadTextureFromImage(perlin_noise_image);
 
@@ -54,7 +56,7 @@ int main(void) {
 
     // At the moment the order of initialization before here for everything is irrelevant
 
-    set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
+    set_pixel_state(get_index((Vector2) { 0, 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
         1, 1, 1
     });
     set_pixel_state(get_index((Vector2) { 10, 10 }), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (PixelId) {
