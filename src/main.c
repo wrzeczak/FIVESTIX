@@ -39,6 +39,8 @@ int main(void) {
     size_t map_state = MS_COUNTRY;
 
     init_camera();
+    // Image perlin_noise = GenImagePerlinNoise()
+
     init_map();
 
     set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
