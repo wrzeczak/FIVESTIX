@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "config.h"
 
 #include "ecs.h"
 #include "board.h"
@@ -50,6 +49,7 @@ int main(void) {
     perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
     Texture2D noise = LoadTextureFromImage(perlin_noise_image);
 
+    init_camera();
     init_map();
 
     set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
