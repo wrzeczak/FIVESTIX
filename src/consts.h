@@ -1,8 +1,5 @@
 #include "raylib.h"
 
-#define SCREEN_WIDTH GetMonitorWidth(GetCurrentMonitor())
-#define SCREEN_HEIGHT GetMonitorHeight(GetCurrentMonitor())
-
 // Either X_PIXELS_COUNT or Y_PIXELS_COUNT should be kept a multiple of 64 so as to keep the color arrays aligned to 64 bytes
 
 #define BOARD_SIZE 256
@@ -16,8 +13,5 @@
 
 #define BOARD_WIDTH (X_PIXELS_COUNT*PIXEL_WIDTH)
 #define BOARD_HEIGHT (Y_PIXELS_COUNT*PIXEL_HEIGHT)
-
-#define X_OFFSET (SCREEN_WIDTH - BOARD_WIDTH) / 2
-#define Y_OFFSET (SCREEN_HEIGHT - BOARD_HEIGHT) / 2
 
 #define MAP_STATES_COUNT 3
