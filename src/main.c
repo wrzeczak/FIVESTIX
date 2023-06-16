@@ -1,9 +1,8 @@
 #include "raylib.h"
-
 #include "ecs.h"
 #include "board.h"
-
 #include "consts.h"
+#include "camera.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -39,6 +38,7 @@ int main(void) {
 
     size_t map_state = MS_COUNTRY;
 
+    init_camera();
     init_map();
 
     set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
@@ -60,6 +60,8 @@ int main(void) {
             map_state %= 3;
         }
 
+        update_camera();
+
         clock_t render_start_clock = clock();
         // WARN: May need to enter texture mode if we add more textures in the future
         UpdateTexture(board_texture, map.colors[map_state]);
@@ -70,10 +72,14 @@ int main(void) {
 
         BeginDrawing();
 
-            ClearBackground(BLACK);
+            BeginMode2D(camera);
 
-            DrawTexturePro(board_texture, (Rectangle){ 0.0f, 0.0f, board_texture.width, board_texture.height },
-                (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+                ClearBackground(BLACK);
+
+                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height },
+                    (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+
+            EndMode2D();
 
             DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, SCREEN_HEIGHT - 50, 20, GREEN);
 
