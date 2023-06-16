@@ -3,8 +3,10 @@
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 
-#define X_PIXELS_COUNT 50
-#define Y_PIXELS_COUNT 50
+// Either X_PIXELS_COUNT or Y_PIXELS_COUNT should be kept a multiple of 64 so as to keep the color arrays aligned to 64 bytes
+
+#define X_PIXELS_COUNT 64
+#define Y_PIXELS_COUNT 64
 #define PIXELS_COUNT (X_PIXELS_COUNT * Y_PIXELS_COUNT)
 
 #define PIXEL_WIDTH 20
