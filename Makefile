@@ -1,11 +1,11 @@
 TARGET := app
 
 SOURCES := $(wildcard src/*.c) $(wildcard src/*.cpp)
-LIBS := -lraylib -lGL -lglut -lGLEW -lglfw -lX11 -lXi -lXrandr -lm
+LIBS := -L"C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\" -lraylib -lGL -lglut -lGLEW -lglfw -lX11 -lXi -lXrandr -lm
 OBJECTS := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCES)))
 DEPENDS := $(patsubst %.c,%.d,$(patsubst %.cpp,%.d,$(SOURCES)))
 
-CFLAGS = -O2 -Wall
+CFLAGS = -IC:\raylib\src -O2 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -std=c++2a
 
 .PHONY: build run clean
