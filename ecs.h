@@ -66,7 +66,7 @@ void set_pixel_state(int index, Color country_color, Color culture_color, Color 
     map.ids[index] = id;
 }
 
-void draw_map(int map_state, RenderTexture2D* tex) {
-    glBindTexture(GL_TEXTURE_2D, tex->texture.id);
+void draw_map(int map_state, Texture2D* tex) {
+    glBindTexture(GL_TEXTURE_2D, tex->id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, X_PIXELS_COUNT, Y_PIXELS_COUNT, GL_RGBA, GL_UNSIGNED_BYTE, map.colors[map_state]);
 }

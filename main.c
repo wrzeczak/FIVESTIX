@@ -52,8 +52,9 @@ int main(void) {
 
     SetTargetFPS(75);
 
-    RenderTexture2D board = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT);
-    SetTextureFilter(board.texture, TEXTURE_FILTER_POINT);
+    // TODO: Load this without discarding a bunch of stuff
+    Texture2D board_texture = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT).texture;
+    SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
 
     int map_state = MS_COUNTRY;
 
@@ -77,7 +78,7 @@ int main(void) {
         }
 
         clock_t render_start_clock = clock();
-        draw_map(map_state, &board);
+        draw_map(map_state, &board_texture);
         clock_t render_end_clock = clock();
         clock_t render_clock_cycles = render_end_clock - render_start_clock;
 
@@ -88,7 +89,7 @@ int main(void) {
 
             ClearBackground(BLACK);
 
-            DrawTexturePro(board.texture, (Rectangle){ 0.0f, 0.0f, board.texture.width, board.texture.height },
+            DrawTexturePro(board_texture, (Rectangle){ 0.0f, 0.0f, board_texture.width, board_texture.height },
                 (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
             DrawText(render_text, 10, SCREEN_HEIGHT - 50, 20, GREEN);
