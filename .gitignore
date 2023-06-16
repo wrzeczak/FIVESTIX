@@ -4,3 +4,5 @@
 *.d
 game
 .vscode
+Makefile
+copyMakefile
