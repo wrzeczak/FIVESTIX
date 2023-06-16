@@ -61,7 +61,8 @@ int main(void) {
         }
 
         clock_t render_start_clock = clock();
-        draw_map(map_state, &board_texture);
+        // WARN: May need to enter texture mode if we add more textures in the future
+        UpdateTexture(board_texture, map.colors[map_state]);
 
         // replaced by TextFormat() -- also, doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
         // char render_text[16];
