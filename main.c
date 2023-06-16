@@ -34,6 +34,17 @@ int get_index(Vector2 pos) {
     return (pos.y * X_PIXELS_COUNT) + pos.x;
 }
 
+void init_map() {
+    memset(&map.ids, 0, sizeof(map.ids));
+
+    for (int i = 0; i < MAP_STATES_COUNT; i++) {
+        Color * pixel_colors = map.colors[i];
+        for (int j = 0; j < PIXELS_COUNT; j++) {
+            pixel_colors[j] = WHITE;
+        }
+    }
+}
+
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello!");
 
@@ -41,13 +52,12 @@ int main(void) {
 
     SetTargetFPS(75);
 
-    RenderTexture2D board = LoadRenderTexture(BOARD_WIDTH, BOARD_HEIGHT);
-    SetTextureFilter(board.texture, TEXTURE_FILTER_BILINEAR);
+    RenderTexture2D board = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT);
+    SetTextureFilter(board.texture, TEXTURE_FILTER_POINT);
 
     int map_state = MS_COUNTRY;
 
-    // TODO: Maybe move to an init or something like that function
-    memset(&map, 0, sizeof(map));
+    init_map();
 
     set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
         1, 1, 1
@@ -67,12 +77,7 @@ int main(void) {
         }
 
         clock_t render_start_clock = clock();
-        BeginTextureMode(board);
-            ClearBackground(RAYWHITE);
-
-            draw_map(map_state);
-
-        EndTextureMode();
+        draw_map(map_state, &board);
         clock_t render_end_clock = clock();
         clock_t render_clock_cycles = render_end_clock - render_start_clock;
 
@@ -83,7 +88,7 @@ int main(void) {
 
             ClearBackground(BLACK);
 
-            DrawTexturePro(board.texture, (Rectangle){ 0.0f, 0.0f, board.texture.width, -board.texture.height },
+            DrawTexturePro(board.texture, (Rectangle){ 0.0f, 0.0f, board.texture.width, board.texture.height },
                 (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
             DrawText(render_text, 10, SCREEN_HEIGHT - 50, 20, GREEN);

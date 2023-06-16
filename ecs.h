@@ -1,4 +1,5 @@
 #include "consts.h"
+#include <GL/glew.h>
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  big game ECS 
@@ -65,14 +66,7 @@ void set_pixel_state(int index, Color country_color, Color culture_color, Color 
     map.ids[index] = id;
 }
 
-void draw_map(int map_state) {
-    // TODO: Maybe rewrite this function to use opengl calls
-    const Color * pixel_colors = map.colors[map_state];
-
-    int i = 0;
-    for(int y = 0; y < Y_PIXELS_COUNT; y++) {
-        for(int x = 0; x < X_PIXELS_COUNT; x++, i++) {
-            DrawRectangle(x*PIXEL_WIDTH, y*PIXEL_HEIGHT, PIXEL_WIDTH, PIXEL_HEIGHT, pixel_colors[i]);
-        }
-    }
+void draw_map(int map_state, RenderTexture2D* tex) {
+    glBindTexture(GL_TEXTURE_2D, tex->texture.id);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, X_PIXELS_COUNT, Y_PIXELS_COUNT, GL_RGBA, GL_UNSIGNED_BYTE, map.colors[map_state]);
 }
