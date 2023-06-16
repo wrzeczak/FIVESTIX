@@ -7,6 +7,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
     struct {
@@ -27,7 +28,7 @@
 
 // testing VSCode github integration...
 
-int index(Vector2 pos) {
+int get_index(Vector2 pos) {
     return (pos.y * PIXEL_COUNT) + pos.x;
 }
 
@@ -43,42 +44,30 @@ int main(void) {
 
     int map_state = MS_COUNTRY;
 
-    PixelState map[PIXEL_COUNT*PIXEL_COUNT];
+    // TODO: Maybe move to an init or something like that function
+    memset(&map, 0, sizeof(map));
 
-    for(int i = 0; i < MAP_SIZE; i++) {
-        map[i] = (PixelState) { NULL, NULL, NULL };
-    }
-
-    Country red_country = (Country) { 1, RED };
-    Country orange_country = (Country) { 1, ORANGE };
-    Country yellow_country = (Country) { 1, YELLOW };
-
-    Culture red_culture = (Culture) { 1, Fade(RED, 0.5f) };
-    Culture orange_culture = (Culture) { 1, Fade(ORANGE, 0.5f) };
-    Culture yellow_culture = (Culture) { 1, Fade(YELLOW, 0.5f) };
-
-    Language red_langugage = (Language) { 1, Fade(RED, 0.25f) };
-    Language orange_language = (Language) { 1, Fade(ORANGE, 0.25f) };
-    Language yellow_language = (Language) { 1, Fade(YELLOW, 0.25f) };
-
-    PixelState red_pixel = (PixelState) { red_country, red_culture, red_langugage };
-    PixelState orange_pixel = (PixelState) { orange_country, orange_culture, orange_language };
-    PixelState yellow_pixel = (PixelState) { yellow_country, yellow_culture, yellow_language };
-
-    set_pixel_state(map, red_pixel, index((Vector2) {0 , 0 }));
-    set_pixel_state(map, orange_pixel, index((Vector2) { 10, 10 }));
-    set_pixel_state(map, yellow_pixel, index((Vector2) { 10, 5 }));
+    set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
+        1, 1, 1
+    });
+    set_pixel_state(get_index((Vector2) { 10, 10 }), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (PixelId) {
+        1, 1, 1
+    });
+    set_pixel_state(get_index((Vector2) { 10, 5 }), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (PixelId) {
+        1, 1, 1
+    });
     
     while(!WindowShouldClose()) {
 
         if(IsKeyPressed(KEY_SPACE)) {
             map_state++;
+            map_state %= 3;
         }
 
         BeginTextureMode(board);
             ClearBackground(RAYWHITE);
 
-            draw_map(map, map_state % 3);
+            draw_map(map_state);
 
         EndTextureMode();
 
