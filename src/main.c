@@ -29,10 +29,14 @@ void init_map() {
     }
 }
 
-int main(void) {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello!");
+#define WINDOWED_SCREEN_WIDTH 1280
+#define WINDOWED_SCREEN_HEIGHT 720
 
-    ToggleFullscreen();
+int main(void) {
+    // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
+    bool fullscreen = false;
+
+    InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
 
     // enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -65,6 +69,22 @@ int main(void) {
     
     while(!WindowShouldClose()) {
 
+        if(IsKeyPressed(KEY_F11)) {
+            fullscreen = !fullscreen;
+            int width;
+            int height;
+            if (fullscreen) {
+                int monitor = GetCurrentMonitor();
+                width = GetMonitorWidth(monitor);
+                height = GetMonitorHeight(monitor);
+            } else {
+                width = WINDOWED_SCREEN_WIDTH;
+                height = WINDOWED_SCREEN_HEIGHT;
+            }
+            ToggleFullscreen();
+            SetWindowSize(width, height);
+        }
+
         if(IsKeyPressed(KEY_SPACE)) {
             map_state++;
             map_state %= 3;
@@ -86,14 +106,13 @@ int main(void) {
 
                 ClearBackground(BLACK);
 
-                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height },
-                    (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
 
             EndMode2D();
 
-            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, SCREEN_HEIGHT - 50, 20, GREEN);
+            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
-            DrawFPS(10, SCREEN_HEIGHT - 25);
+            DrawFPS(10, GetRenderHeight() - 25);
 
         EndDrawing();
 
