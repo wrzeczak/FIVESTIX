@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <stdio.h>
 
 /*
     struct {
@@ -64,12 +66,18 @@ int main(void) {
             map_state %= 3;
         }
 
+        clock_t render_start_clock = clock();
         BeginTextureMode(board);
             ClearBackground(RAYWHITE);
 
             draw_map(map_state);
 
         EndTextureMode();
+        clock_t render_end_clock = clock();
+        clock_t render_clock_cycles = render_end_clock - render_start_clock;
+
+        char render_text[16];
+        snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
 
         BeginDrawing();
 
@@ -77,6 +85,8 @@ int main(void) {
 
             DrawTexturePro(board.texture, (Rectangle){ 0.0f, 0.0f, board.texture.width, -board.texture.height },
                 (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+            DrawText(render_text, 10, SCREEN_HEIGHT - 50, 20, GREEN);
 
             DrawFPS(10, SCREEN_HEIGHT - 25);
 
