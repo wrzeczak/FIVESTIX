@@ -45,9 +45,9 @@ typedef struct {
 // All data is indexed in row-major order, i.e x then y
 typedef struct {
     // One array of colors (a texture in the future?) for each map state
-    _Alignas(64) Color colors[MAP_STATES_COUNT][MAP_SIZE];
+    _Alignas(64) Color colors[MAP_STATES_COUNT][PIXELS_COUNT];
     // Pixel id information, maybe split into seperate arrays in the future if needed
-    _Alignas(64) PixelId ids[MAP_SIZE];
+    _Alignas(64) PixelId ids[PIXELS_COUNT];
 } PixelStates;
 
 // TODO: Link this properly
@@ -70,9 +70,9 @@ void draw_map(int map_state) {
     const Color * pixel_colors = map.colors[map_state];
 
     int i = 0;
-    for(int y = 0; y < PIXEL_COUNT; y++) {
-        for(int x = 0; x < PIXEL_COUNT; x++, i++) {
-            DrawRectangle(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE, pixel_colors[i]);
+    for(int y = 0; y < Y_PIXELS_COUNT; y++) {
+        for(int x = 0; x < X_PIXELS_COUNT; x++, i++) {
+            DrawRectangle(x*PIXEL_WIDTH, y*PIXEL_HEIGHT, PIXEL_WIDTH, PIXEL_HEIGHT, pixel_colors[i]);
         }
     }
 }

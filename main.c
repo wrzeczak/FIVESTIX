@@ -29,7 +29,7 @@
 // testing VSCode github integration...
 
 int get_index(Vector2 pos) {
-    return (pos.y * PIXEL_COUNT) + pos.x;
+    return (pos.y * X_PIXELS_COUNT) + pos.x;
 }
 
 int main(void) {
@@ -39,7 +39,7 @@ int main(void) {
 
     SetTargetFPS(75);
 
-    RenderTexture2D board = LoadRenderTexture(GAME_SIZE, GAME_SIZE);
+    RenderTexture2D board = LoadRenderTexture(BOARD_WIDTH, BOARD_HEIGHT);
     SetTextureFilter(board.texture, TEXTURE_FILTER_BILINEAR);
 
     int map_state = MS_COUNTRY;
@@ -76,7 +76,7 @@ int main(void) {
             ClearBackground(BLACK);
 
             DrawTexturePro(board.texture, (Rectangle){ 0.0f, 0.0f, board.texture.width, -board.texture.height },
-                (Rectangle){ X_OFFSET, Y_OFFSET, GAME_SIZE, GAME_SIZE}, (Vector2){ 0, 0 }, 0.0f, WHITE);
+                (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
             DrawFPS(10, SCREEN_HEIGHT - 25);
 
