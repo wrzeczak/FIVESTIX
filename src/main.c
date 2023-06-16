@@ -78,6 +78,8 @@ int main(void) {
                 width = WINDOWED_SCREEN_WIDTH;
                 height = WINDOWED_SCREEN_HEIGHT;
             }
+            // Doing this twice because it doesnt work if only done once
+            SetWindowSize(width, height);
             ToggleFullscreen();
             SetWindowSize(width, height);
         }
@@ -108,7 +110,7 @@ int main(void) {
 
             DrawTexture(noise, 100, 100, WHITE);
             
-            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetScreenHeight() - 50, 20, GREEN);
+            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
             DrawFPS(10, GetRenderHeight() - 25);
 
