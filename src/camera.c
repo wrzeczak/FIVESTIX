@@ -7,6 +7,7 @@
 Camera2D camera;
 static Vector2 camera_velocity = { 0.0f, 0.0f };
 
+// Not really necessary could be initialized globally
 void init_camera(void) {
     camera.target = (Vector2) { 0.0f, 0.0f };
     camera.offset = (Vector2) { 0.0f, 0.0f };

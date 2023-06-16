@@ -35,7 +35,7 @@ int main(void) {
 
     InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
 
-    // enable vsync
+    // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     // TODO: Load this without discarding a bunch of stuff
@@ -52,6 +52,8 @@ int main(void) {
     init_camera();
     init_map();
 
+    // At the moment the order of initialization before here for everything is irrelevant
+
     set_pixel_state(get_index((Vector2) {0 , 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
         1, 1, 1
     });
@@ -66,6 +68,7 @@ int main(void) {
     
     while(!WindowShouldClose()) {
 
+        // Ugly hack, unless you know how to make fullscreen work correctly do not touch this
         if(IsKeyPressed(KEY_F11)) {
             fullscreen = !fullscreen;
             int width;
@@ -91,18 +94,14 @@ int main(void) {
 
         update_camera();
 
+        // Doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
         clock_t render_start_clock = clock();
         // WARN: May need to enter texture mode if we add more textures in the future
         UpdateTexture(board_texture, map.colors[map_state]);
 
-        // replaced by TextFormat() -- also, doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
-        // char render_text[16];
-        // snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
-
         BeginDrawing();
 
             BeginMode2D(camera);
-
                 ClearBackground(BLACK);
 
                 DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
