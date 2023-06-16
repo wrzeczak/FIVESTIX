@@ -39,9 +39,8 @@ typedef enum {
 // pixel functions
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void set_pixel_state(PixelState * map, PixelState px, Vector2 pos) {
-    int idx = pos.y * PIXEL_COUNT + pos.x;
-    map[idx] = px;
+void set_pixel_state(PixelState * map, PixelState px, int pos) {
+    map[pos] = px;
 }
 
 void draw_map(PixelState * map, int map_state) {

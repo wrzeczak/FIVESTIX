@@ -27,6 +27,10 @@
 
 // testing VSCode github integration...
 
+int index(Vector2 pos) {
+    return (pos.y * PIXEL_COUNT) + pos.x;
+}
+
 int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello!");
 
@@ -61,9 +65,9 @@ int main(void) {
     PixelState orange_pixel = (PixelState) { orange_country, orange_culture, orange_language };
     PixelState yellow_pixel = (PixelState) { yellow_country, yellow_culture, yellow_language };
 
-    set_pixel_state(map, red_pixel, (Vector2) {0 , 0 });
-    set_pixel_state(map, orange_pixel, (Vector2) { 10, 10 });
-    set_pixel_state(map, yellow_pixel, (Vector2) { 10, 5 });
+    set_pixel_state(map, red_pixel, index((Vector2) {0 , 0 }));
+    set_pixel_state(map, orange_pixel, index((Vector2) { 10, 10 }));
+    set_pixel_state(map, yellow_pixel, index((Vector2) { 10, 5 }));
     
     while(!WindowShouldClose()) {
 
