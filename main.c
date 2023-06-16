@@ -63,8 +63,9 @@ int main(void) {
         clock_t render_end_clock = clock();
         clock_t render_clock_cycles = render_end_clock - render_start_clock;
 
-        char render_text[16];
-        snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
+        // replaced by TextFormat() -- also, doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
+        // char render_text[16];
+        // snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
 
         BeginDrawing();
 
@@ -73,7 +74,7 @@ int main(void) {
             DrawTexturePro(board_texture, (Rectangle){ 0.0f, 0.0f, board_texture.width, board_texture.height },
                 (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
-            DrawText(render_text, 10, SCREEN_HEIGHT - 50, 20, GREEN);
+            DrawText(TextFormat(TextFormat("RND: %ld", render_clock_cycles), render_clock_cycles), 10, SCREEN_HEIGHT - 50, 20, GREEN);
 
             DrawFPS(10, SCREEN_HEIGHT - 25);
 
