@@ -1,5 +1,8 @@
 #include "raylib.h"
 
+#define SUPPORT_MODULE_RTEXTURES
+#define SUPPORT_IMAGE_GENERATION
+#define EX
 #include "ecs.h"
 #include "board.h"
 
@@ -39,7 +42,11 @@ int main(void) {
 
     size_t map_state = MS_COUNTRY;
 
-    // Image perlin_noise = GenImagePerlinNoise()
+    Image perlin_noise_image;
+
+    perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
+
+    Texture2D noise = LoadTextureFromImage(perlin_noise_image);
 
     init_map();
 
