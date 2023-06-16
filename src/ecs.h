@@ -51,17 +51,11 @@ typedef struct {
     _Alignas(64) PixelId ids[PIXELS_COUNT];
 } PixelStates;
 
-// TODO: Link this properly
 // Global variable used because theres only one map
-static PixelStates map;
+extern PixelStates map;
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // pixel functions
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void set_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, PixelId id) {
-    map.colors[MS_COUNTRY][index] = country_color;
-    map.colors[MS_CULTURE][index] = culture_color;
-    map.colors[MS_LANGUAGE][index] = language_color;
-    map.ids[index] = id;
-}
+void set_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, PixelId id);
