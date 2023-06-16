@@ -11,35 +11,16 @@
 #include <time.h>
 #include <stdio.h>
 
-/*
-    struct {
-        colors[3];
-        ...
-    } Pixel;
-
-    int map_state = MS_COUNTRY
-
-    if (spacebar has been pressed) {
-        map_state++;
-    }
-    draw the texture {
-        draw rect ... pixel.color[map_state % 3];
-    }
-
-*/
-
-// testing VSCode github integration...
-
-int get_index(Vector2 pos) {
+size_t get_index(Vector2 pos) {
     return (pos.y * X_PIXELS_COUNT) + pos.x;
 }
 
 void init_map() {
     memset(&map.ids, 0, sizeof(map.ids));
 
-    for (int i = 0; i < MAP_STATES_COUNT; i++) {
+    for(size_t i = 0; i < MAP_STATES_COUNT; i++) {
         Color * pixel_colors = map.colors[i];
-        for (int j = 0; j < PIXELS_COUNT; j++) {
+        for(size_t j = 0; j < PIXELS_COUNT; j++) {
             pixel_colors[j] = WHITE;
         }
     }
@@ -56,7 +37,7 @@ int main(void) {
     Texture2D board_texture = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT).texture;
     SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
 
-    int map_state = MS_COUNTRY;
+    size_t map_state = MS_COUNTRY;
 
     init_map();
 

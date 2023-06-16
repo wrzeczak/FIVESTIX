@@ -34,7 +34,7 @@ typedef enum {
     MS_COUNTRY,
     MS_CULTURE,
     MS_LANGUAGE
-} MapStates;
+} MapState;
 
 typedef struct {
     unsigned short country_id;
@@ -59,14 +59,14 @@ static PixelStates map;
 // pixel functions
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void set_pixel_state(int index, Color country_color, Color culture_color, Color language_color, PixelId id) {
+void set_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, PixelId id) {
     map.colors[MS_COUNTRY][index] = country_color;
     map.colors[MS_CULTURE][index] = culture_color;
     map.colors[MS_LANGUAGE][index] = language_color;
     map.ids[index] = id;
 }
 
-void draw_map(int map_state, Texture2D* tex) {
+void draw_map(size_t map_state, Texture2D* tex) {
     glBindTexture(GL_TEXTURE_2D, tex->id);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, X_PIXELS_COUNT, Y_PIXELS_COUNT, GL_RGBA, GL_UNSIGNED_BYTE, map.colors[map_state]);
 }
