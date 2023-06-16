@@ -27,8 +27,6 @@ void init_map() {
 }
 
 int main(void) {
-    char render_text[16];
-
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello!");
 
     ToggleFullscreen();
@@ -52,6 +50,8 @@ int main(void) {
     set_pixel_state(get_index((Vector2) { 10, 5 }), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (PixelId) {
         1, 1, 1
     });
+
+    clock_t render_clock_cycles = 0;
     
     while(!WindowShouldClose()) {
 
@@ -63,6 +63,10 @@ int main(void) {
         clock_t render_start_clock = clock();
         draw_map(map_state, &board_texture);
 
+        // replaced by TextFormat() -- also, doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
+        // char render_text[16];
+        // snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
+
         BeginDrawing();
 
             ClearBackground(BLACK);
@@ -70,14 +74,13 @@ int main(void) {
             DrawTexturePro(board_texture, (Rectangle){ 0.0f, 0.0f, board_texture.width, board_texture.height },
                 (Rectangle){ X_OFFSET, Y_OFFSET, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
-            DrawFPS(10, SCREEN_HEIGHT - 25);
+            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, SCREEN_HEIGHT - 50, 20, GREEN);
 
-            DrawText(render_text, 10, SCREEN_HEIGHT - 50, 20, GREEN);
+            DrawFPS(10, SCREEN_HEIGHT - 25);
 
         EndDrawing();
 
         clock_t render_end_clock = clock();
-        clock_t render_clock_cycles = render_end_clock - render_start_clock;
-        snprintf(render_text, 16, "RND: %ld", render_clock_cycles);
+        render_clock_cycles = render_end_clock - render_start_clock;
     }
 }
