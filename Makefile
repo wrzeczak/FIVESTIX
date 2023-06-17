@@ -5,7 +5,7 @@ LIBS := -L"C:\\vcpkg\\packages\\raylib_x64-windows\\bin" -lraylib
 OBJECTS := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCES)))
 DEPENDS := $(patsubst %.c,%.d,$(patsubst %.cpp,%.d,$(SOURCES)))
 
-CFLAGS = -IC:\raylib\src -O2 -Wall
+CFLAGS = -IC:\raylib\src -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -std=c++2a
 
 .PHONY: build run clean
