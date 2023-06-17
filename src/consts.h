@@ -12,4 +12,4 @@
 
 //
 
-#define MAP_STATES_COUNT 3
+#define BOARD_MAP_STATES_COUNT 3

@@ -1,7 +1,7 @@
 #include "raylib.h"
 
-#include "ecs.h"
 #include "board.h"
+#include "board_gen.h"
 #include "consts.h"
 #include "camera.h"
 #include "ext.h"
@@ -17,22 +17,10 @@ static size_t get_index(Vector2 pos) {
     return (pos.y * BOARD_SIZE) + pos.x;
 }
 
-static void init_map() {
-    memset(&map.ids, 0, sizeof(map.ids));
-
-    for(size_t i = 0; i < MAP_STATES_COUNT; i++) {
-        Color * pixel_colors = map.colors[i];
-        for(size_t j = 0; j < BOARD_PIXEL_COUNT; j++) {
-            pixel_colors[j] = WHITE;
-        }
-    }
-}
-
 #define WINDOWED_SCREEN_WIDTH 1280
 #define WINDOWED_SCREEN_HEIGHT 720
 
 _Alignas(64) static float heightmap[BOARD_PIXEL_COUNT];
-_Alignas(64) static Color terrain_pixel_colors[BOARD_PIXEL_COUNT];
 
 int main(void) {
     // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
@@ -45,10 +33,10 @@ int main(void) {
     // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    Texture2D board_state_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
+    Texture2D map_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
     Texture2D terrain_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
 
-    SetTextureFilter(board_state_texture, TEXTURE_FILTER_POINT);
+    SetTextureFilter(map_texture, TEXTURE_FILTER_POINT);
     SetTextureFilter(terrain_texture, TEXTURE_FILTER_POINT);
 
     size_t map_state = MS_COUNTRY;
@@ -56,21 +44,21 @@ int main(void) {
     int generation_seed = rand();
 
     gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
-    gen_terrain_image(0.33f, BOARD_SIZE, heightmap, terrain_pixel_colors);
-    UpdateTexture(terrain_texture, terrain_pixel_colors);
+    update_terrain_pixel_colors(0.33f, heightmap);
+    UpdateTexture(terrain_texture, board.terrain_pixel_colors);
 
     init_camera();
-    init_map();
+    init_board();
 
     // At the moment the order of initialization before here for everything is irrelevant
 
-    set_pixel_state(get_index((Vector2) { 0, 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (PixelId) {
+    set_board_map_pixel_state(get_index((Vector2) { 0, 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (BoardPixelId) {
         1, 1, 1
     });
-    set_pixel_state(get_index((Vector2) { 10, 10 }), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (PixelId) {
+    set_board_map_pixel_state(get_index((Vector2) { 10, 10 }), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (BoardPixelId) {
         1, 1, 1
     });
-    set_pixel_state(get_index((Vector2) { 10, 5 }), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (PixelId) {
+    set_board_map_pixel_state(get_index((Vector2) { 10, 5 }), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (BoardPixelId) {
         1, 1, 1
     });
 
@@ -103,8 +91,8 @@ int main(void) {
 
             generation_seed++;
             gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
-            gen_terrain_image(0.33f, BOARD_SIZE, heightmap, terrain_pixel_colors);
-            UpdateTexture(terrain_texture, terrain_pixel_colors);
+            update_terrain_pixel_colors(0.33f, heightmap);
+            UpdateTexture(terrain_texture, board.terrain_pixel_colors);
         }
 
         update_camera();
@@ -112,14 +100,14 @@ int main(void) {
         // Doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
         clock_t render_start_clock = clock();
         //! WARN: May need to enter texture mode if we add more textures in the future
-        UpdateTexture(board_state_texture, map.colors[map_state]);
+        UpdateTexture(map_texture, board.map_pixel_colors_arrays[map_state]);
 
         BeginDrawing();
 
             BeginMode2D(camera);
                 ClearBackground(BLACK);
 
-                DrawTexturePro(board_state_texture, (Rectangle) { 0.0f, 0.0f, board_state_texture.width, board_state_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                DrawTexturePro(map_texture, (Rectangle) { 0.0f, 0.0f, map_texture.width, map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
                 DrawTextureEx(terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
 
             EndMode2D();
