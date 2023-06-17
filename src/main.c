@@ -34,6 +34,8 @@ int main(void) {
     // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
     bool fullscreen = false;
 
+    srand(time(NULL));
+
     InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
 
     // Enable vsync
@@ -44,12 +46,15 @@ int main(void) {
 
     size_t map_state = MS_COUNTRY;
 
-    Image perlin_noise_image;
+    int generation_seed = rand();
 
     //! TODO: Make our own perlin noise algorithm or use another library, as this uses the heap along with not being able to set a seed
     //! NOTE: This uses the heap
-    perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
-    Texture2D noise = LoadTextureFromImage(perlin_noise_image);
+    Image raw_noise_image = gen_raw_noise(BOARD_SIZE, generation_seed);
+    Image ocean_image = gen_oceans(BOARD_SIZE, generation_seed, 0.33f);
+    
+    Texture2D noise_texture = LoadTextureFromImage(raw_noise_image);
+    Texture2D ocean_texture = LoadTextureFromImage(ocean_image);
 
     init_camera();
     init_map();
@@ -92,6 +97,13 @@ int main(void) {
         if(IsKeyPressed(KEY_SPACE)) {
             map_state++;
             map_state %= 3;
+
+            generation_seed++;
+            raw_noise_image = gen_raw_noise(BOARD_SIZE, generation_seed);
+            ocean_image = gen_oceans(BOARD_SIZE, generation_seed, 0.33f);
+
+            noise_texture = LoadTextureFromImage(raw_noise_image);
+            ocean_texture = LoadTextureFromImage(ocean_image);
         }
 
         update_camera();
@@ -106,10 +118,11 @@ int main(void) {
             BeginMode2D(camera);
                 ClearBackground(BLACK);
 
-                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                // awTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
             EndMode2D();
 
-            DrawTexture(noise, 100, 100, WHITE);
+            DrawTextureEx(noise_texture, (Vector2) { 0, 0 }, 0.0f, 1.5f, WHITE);
+            DrawTextureEx(ocean_texture, (Vector2) { BOARD_SIZE * 1.5f, 0 }, 0.0f, 1.5f, WHITE);
             
             DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
