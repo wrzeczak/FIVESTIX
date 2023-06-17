@@ -43,8 +43,13 @@ int main(void) {
 
     int generation_seed = rand();
 
+    clock_t generation_start_clock = clock();
     gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
     update_terrain_pixel_colors(0.33f, heightmap);
+    clock_t generation_end_clock = clock();
+
+    clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
+
     UpdateTexture(terrain_texture, board.terrain_pixel_colors);
 
     init_camera();
@@ -90,8 +95,12 @@ int main(void) {
             map_state %= 3;
 
             generation_seed++;
+            generation_start_clock = clock();
             gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
             update_terrain_pixel_colors(0.33f, heightmap);
+            generation_end_clock = clock();
+            generation_clock_cycles = generation_end_clock - generation_start_clock;
+
             UpdateTexture(terrain_texture, board.terrain_pixel_colors);
         }
 
@@ -112,6 +121,7 @@ int main(void) {
 
             EndMode2D();
             
+            DrawText(TextFormat("GEN: %ld", generation_clock_cycles), 10, GetRenderHeight() - 70, 20, GREEN);
             DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
             DrawFPS(10, GetRenderHeight() - 25);
