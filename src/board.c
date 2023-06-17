@@ -1,6 +1,8 @@
 #include "board.h"
+#include "raymath.h"
 #include <stdalign.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "fastnoise.h"
 #define FML_IMPL
@@ -33,19 +35,63 @@ void update_board_terrain(int seed, float ocean_threshold) {
     noise.gain = 0.40f;
     noise.weighted_strength = -0.70f;
 
-    size_t i = 0;
-    for(size_t y = 0; y < BOARD_SIZE; y++) {
-        for(size_t x = 0; x < BOARD_SIZE; x++, i++) {
-            float height = fnlGetNoise2D(&noise, x, y);
-            height += 1;
-            height /= 2.0f;
+    {
+        size_t i = 0;
+        for(float y = 0; y < BOARD_SIZE; y++) {
+            for(float x = 0; x < BOARD_SIZE; x++, i++) {
+                float height = fnlGetNoise2D(&noise, x, y);
+                height += 1;
+                height /= 2.0f;
 
-            heights[i] = height;
+                heights[i] = height;
 
-            if(height > ocean_threshold) {
-                pixel_colors[i] = Fade(GREEN, height);
-            } else {
-                pixel_colors[i] = Fade(BLUE, height);
+                if(height > ocean_threshold) {
+                    pixel_colors[i] = Fade(GREEN, height);
+                } else {
+                    pixel_colors[i] = Fade(BLUE, height);
+                }
+            }
+        }
+    }
+
+    // Gradient ascent to find high points
+    // Upper bound in case algorithm doesnt stop
+    Vector2 cur_pos = { 50.0f, 50.0f };
+
+    size_t index = 0;
+    for(size_t iter = 0; iter < 1024; iter++) {
+        index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
+
+        // Don't want to go out of bounds, this also follows from all local maxima and minima not being on the edge of the heightmap
+        // Note that for unsigned integers, it can be the case that k >= n but not k + s >= n
+        if (index >= BOARD_PIXEL_COUNT || index + BOARD_SIZE >= BOARD_PIXEL_COUNT) {
+            index = -1;
+            break;
+        }
+
+        float height = heights[index];
+
+        Vector2 height_delta = { heights[index + 1] - height, heights[index + BOARD_SIZE] - height };
+
+        // Not really standard for gradient ascent afaik, but this makes it takes less steps
+        height_delta = Vector2Scale(height_delta, 32.0f);
+
+        cur_pos = Vector2Subtract(cur_pos, height_delta);
+
+        // printf("%f, %f\n", cur_pos.x, cur_pos.y);
+    }
+
+    if (index == -1) {
+        return;
+    }
+
+    // index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
+    
+    {
+        for(size_t y = cur_pos.y; y <= cur_pos.y + 5 && y < BOARD_SIZE; y++) {
+            for (size_t x = cur_pos.x; x <= cur_pos.x + 5 && x < BOARD_SIZE; x++) {
+                size_t i = (y * BOARD_SIZE) + x;
+                pixel_colors[i] = RED;
             }
         }
     }

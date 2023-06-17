@@ -38,7 +38,9 @@ int main(void) {
 
     size_t map_state = MS_COUNTRY;
 
-    int generation_seed = rand();
+    // Don't do this until we actually want random terrain
+    // int generation_seed = rand();
+    int generation_seed = 0;
 
     clock_t generation_start_clock = clock();
     update_board_terrain(generation_seed, 0.33f);
