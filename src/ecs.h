@@ -47,7 +47,7 @@ typedef struct {
 // Using SoA here as to cut down on cacheline usage
 // All data is indexed in row-major order, i.e x then y
 typedef struct {
-    // One array of colors (a texture in the future?) for each map state
+    // One array of colors for each map state
     _Alignas(64) Color colors[MAP_STATES_COUNT][PIXELS_COUNT];
     // Pixel id information, maybe split into seperate arrays in the future if needed
     _Alignas(64) PixelId ids[PIXELS_COUNT];
@@ -60,4 +60,5 @@ extern PixelStates map;
 // pixel functions
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
 void set_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, PixelId id);

@@ -3,7 +3,6 @@
 
 _Alignas(64) PixelStates map;
 
-// This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
 void set_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, PixelId id) {
     map.colors[MS_COUNTRY][index] = country_color;
     map.colors[MS_CULTURE][index] = culture_color;

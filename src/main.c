@@ -80,7 +80,7 @@ int main(void) {
             fullscreen = !fullscreen;
             int width;
             int height;
-            if (fullscreen) {
+            if(fullscreen) {
                 int monitor = GetCurrentMonitor();
                 width = GetMonitorWidth(monitor);
                 height = GetMonitorHeight(monitor);
@@ -118,11 +118,11 @@ int main(void) {
             BeginMode2D(camera);
                 ClearBackground(BLACK);
 
-                // awTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
-            EndMode2D();
+                // DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                DrawTextureEx(noise_texture, (Vector2) { 0, 0 }, 0.0f, 1.5f, WHITE);
+                DrawTextureEx(ocean_texture, (Vector2) { BOARD_SIZE * 1.5f, 0 }, 0.0f, 1.5f, WHITE);
 
-            DrawTextureEx(noise_texture, (Vector2) { 0, 0 }, 0.0f, 1.5f, WHITE);
-            DrawTextureEx(ocean_texture, (Vector2) { BOARD_SIZE * 1.5f, 0 }, 0.0f, 1.5f, WHITE);
+            EndMode2D();
             
             DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
