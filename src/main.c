@@ -11,17 +11,18 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#include <stdalign.h>
 
-size_t get_index(Vector2 pos) {
-    return (pos.y * X_PIXELS_COUNT) + pos.x;
+static size_t get_index(Vector2 pos) {
+    return (pos.y * BOARD_SIZE) + pos.x;
 }
 
-void init_map() {
+static void init_map() {
     memset(&map.ids, 0, sizeof(map.ids));
 
     for(size_t i = 0; i < MAP_STATES_COUNT; i++) {
         Color * pixel_colors = map.colors[i];
-        for(size_t j = 0; j < PIXELS_COUNT; j++) {
+        for(size_t j = 0; j < BOARD_PIXEL_COUNT; j++) {
             pixel_colors[j] = WHITE;
         }
     }
@@ -29,6 +30,9 @@ void init_map() {
 
 #define WINDOWED_SCREEN_WIDTH 1280
 #define WINDOWED_SCREEN_HEIGHT 720
+
+_Alignas(64) static float heightmap[BOARD_PIXEL_COUNT];
+_Alignas(64) static Color terrain_pixel_colors[BOARD_PIXEL_COUNT];
 
 int main(void) {
     // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
@@ -41,19 +45,15 @@ int main(void) {
     // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    Texture2D board_texture = init_texture_with_size(X_PIXELS_COUNT, Y_PIXELS_COUNT);
+    Texture2D board_state_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
     Texture2D terrain_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
 
-    SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
+    SetTextureFilter(board_state_texture, TEXTURE_FILTER_POINT);
     SetTextureFilter(terrain_texture, TEXTURE_FILTER_POINT);
 
     size_t map_state = MS_COUNTRY;
 
     int generation_seed = rand();
-
-    //! TODO: Rework
-    float * heightmap = malloc(BOARD_SIZE*BOARD_SIZE*sizeof(float));
-    Color * terrain_pixel_colors = malloc(BOARD_SIZE*BOARD_SIZE*sizeof(Color));
 
     gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
     gen_terrain_image(0.33f, BOARD_SIZE, heightmap, terrain_pixel_colors);
@@ -112,14 +112,14 @@ int main(void) {
         // Doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
         clock_t render_start_clock = clock();
         //! WARN: May need to enter texture mode if we add more textures in the future
-        UpdateTexture(board_texture, map.colors[map_state]);
+        UpdateTexture(board_state_texture, map.colors[map_state]);
 
         BeginDrawing();
 
             BeginMode2D(camera);
                 ClearBackground(BLACK);
 
-                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                DrawTexturePro(board_state_texture, (Rectangle) { 0.0f, 0.0f, board_state_texture.width, board_state_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
                 DrawTextureEx(terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
 
             EndMode2D();

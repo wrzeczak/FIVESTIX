@@ -48,9 +48,9 @@ typedef struct {
 // All data is indexed in row-major order, i.e x then y
 typedef struct {
     // One array of colors for each map state
-    _Alignas(64) Color colors[MAP_STATES_COUNT][PIXELS_COUNT];
+    _Alignas(64) Color colors[MAP_STATES_COUNT][BOARD_PIXEL_COUNT];
     // Pixel id information, maybe split into seperate arrays in the future if needed
-    _Alignas(64) PixelId ids[PIXELS_COUNT];
+    _Alignas(64) PixelId ids[BOARD_PIXEL_COUNT];
 } PixelStates;
 
 // Global variable used because theres only one map

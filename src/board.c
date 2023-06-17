@@ -34,11 +34,12 @@ void gen_heightmap(int seed, size_t size, float * heightmap) {
     }
 }
 
-void gen_terrain_image(float ocean_threshold, size_t size, const float * restrict heightmap, Color * pixel_colors) {
+void gen_terrain_image(float ocean_threshold, size_t size, const float *restrict heightmap, Color * pixel_colors) {
     size_t pixel_count = size*size;
 
     for(size_t i = 0; i < pixel_count; i++) {
         //! TODO: If the compiler can't optimize this branch well we may have to do some fuckery
+        //! NOTE: The compiler indeed does branch here
         float height = heightmap[i];
         if(height > ocean_threshold) {
             pixel_colors[i] = Fade(GREEN, height);
