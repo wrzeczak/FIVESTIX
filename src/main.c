@@ -1,7 +1,6 @@
 #include "raylib.h"
 
 #include "board.h"
-#include "board_gen.h"
 #include "consts.h"
 #include "camera.h"
 #include "ext.h"
@@ -19,8 +18,6 @@ static size_t get_index(Vector2 pos) {
 
 #define WINDOWED_SCREEN_WIDTH 1280
 #define WINDOWED_SCREEN_HEIGHT 720
-
-_Alignas(64) static float heightmap[BOARD_PIXEL_COUNT];
 
 int main(void) {
     // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
@@ -44,8 +41,7 @@ int main(void) {
     int generation_seed = rand();
 
     clock_t generation_start_clock = clock();
-    gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
-    update_terrain_pixel_colors(0.33f, heightmap);
+    update_board_terrain(generation_seed, 0.33f);
     clock_t generation_end_clock = clock();
 
     clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
@@ -96,8 +92,7 @@ int main(void) {
 
             generation_seed++;
             generation_start_clock = clock();
-            gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
-            update_terrain_pixel_colors(0.33f, heightmap);
+            update_board_terrain(generation_seed, 0.33f);
             generation_end_clock = clock();
             generation_clock_cycles = generation_end_clock - generation_start_clock;
 

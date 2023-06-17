@@ -2,6 +2,9 @@
 #include <stdalign.h>
 #include <string.h>
 
+#include "fastnoise.h"
+#define FML_IMPL
+
 _Alignas(64) Board board;
 
 void init_board() {
@@ -15,17 +18,35 @@ void init_board() {
     }
 }
 
-void update_terrain_pixel_colors(float ocean_threshold, const float * restrict heightmap) {
+void update_board_terrain(int seed, float ocean_threshold) {
+    float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;
 
-    for(size_t i = 0; i < BOARD_PIXEL_COUNT; i++) {
-        //! TODO: If the compiler can't optimize this branch well we may have to do some fuckery
-        //! NOTE: The compiler indeed does branch here
-        float height = heightmap[i];
-        if(height > ocean_threshold) {
-            pixel_colors[i] = Fade(GREEN, height);
-        } else {
-            pixel_colors[i] = Fade(BLUE, height);
+    fnl_state noise = fnlCreateState();
+    noise.noise_type = FNL_NOISE_PERLIN;
+    noise.seed = seed;
+
+    // cue the magic numbers - discovered while messing around with the fnl GUI
+    noise.fractal_type = FNL_FRACTAL_FBM;
+    noise.frequency = 0.005f;
+    noise.octaves = 6;
+    noise.gain = 0.40f;
+    noise.weighted_strength = -0.70f;
+
+    size_t i = 0;
+    for(size_t y = 0; y < BOARD_SIZE; y++) {
+        for(size_t x = 0; x < BOARD_SIZE; x++, i++) {
+            float height = fnlGetNoise2D(&noise, x, y);
+            height += 1;
+            height /= 2.0f;
+
+            heights[i] = height;
+
+            if(height > ocean_threshold) {
+                pixel_colors[i] = Fade(GREEN, height);
+            } else {
+                pixel_colors[i] = Fade(BLUE, height);
+            }
         }
     }
 }
