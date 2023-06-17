@@ -1,4 +1,4 @@
-#include "raylib.h"
+#pragma once
 
 // Either X_PIXELS_COUNT or Y_PIXELS_COUNT should be kept a multiple of 64 so as to keep the color arrays aligned to 64 bytes
 

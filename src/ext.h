@@ -1,11 +1,8 @@
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// Game Board Generation Functions
+// Raylib extension functions, these functions use rlgl to provide more raylib functionality
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #pragma once
 #include "raylib.h"
-#include <time.h> // time(NULL)
-#include <stdlib.h> // rand()
 
-Image gen_raw_noise(int size, int seed);
-Image gen_oceans(int size, int seed, float ocean_threshold);
+Texture2D init_texture_with_size(int width, int height);

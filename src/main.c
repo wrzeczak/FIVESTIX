@@ -4,6 +4,7 @@
 #include "board.h"
 #include "consts.h"
 #include "camera.h"
+#include "ext.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -38,8 +39,7 @@ int main(void) {
     // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    //! TODO: Load this without discarding a bunch of stuff
-    Texture2D board_texture = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT).texture;
+    Texture2D board_texture = init_texture_with_size(X_PIXELS_COUNT, Y_PIXELS_COUNT);
     SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
 
     size_t map_state = MS_COUNTRY;
