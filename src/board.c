@@ -22,6 +22,7 @@ Image gen_raw_noise(int size, int seed) {
     noise.gain = 0.40f;
     noise.weighted_strength = -0.70f;
 
+    //! NOTE: This uses the heap
     Image output = GenImageColor(size, size, BLACK);
 
     for(int y = 0; y < size; y++) {
@@ -29,6 +30,7 @@ Image gen_raw_noise(int size, int seed) {
             float noise_data = fnlGetNoise2D(&noise, x, y);
             noise_data += 1;
             noise_data /= 2.0f;
+            // Why not set this directly?
             ImageDrawPixel(&output, x, y, Fade(RED, noise_data));
         }
     }
