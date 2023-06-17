@@ -38,7 +38,7 @@ int main(void) {
     // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    // TODO: Load this without discarding a bunch of stuff
+    //! TODO: Load this without discarding a bunch of stuff
     Texture2D board_texture = LoadRenderTexture(X_PIXELS_COUNT, Y_PIXELS_COUNT).texture;
     SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
 
@@ -46,8 +46,8 @@ int main(void) {
 
     Image perlin_noise_image;
 
-    // TODO: Make our own perlin noise algorithm or use another library, as this uses the heap along with not being able to set a seed
-    // NOTE: This uses the heap
+    //! TODO: Make our own perlin noise algorithm or use another library, as this uses the heap along with not being able to set a seed
+    //! NOTE: This uses the heap
     perlin_noise_image = GenImagePerlinNoise(BOARD_SIZE, BOARD_SIZE, 0, 0, 1.0f);
     Texture2D noise = LoadTextureFromImage(perlin_noise_image);
 
@@ -98,7 +98,7 @@ int main(void) {
 
         // Doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
         clock_t render_start_clock = clock();
-        // WARN: May need to enter texture mode if we add more textures in the future
+        //! WARN: May need to enter texture mode if we add more textures in the future
         UpdateTexture(board_texture, map.colors[map_state]);
 
         BeginDrawing();
