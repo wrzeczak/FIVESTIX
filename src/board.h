@@ -4,8 +4,7 @@
 
 #pragma once
 #include "raylib.h"
-#include <time.h> // time(NULL)
-#include <stdlib.h> // rand()
+#include <stddef.h>
 
-Image gen_raw_noise(int size, int seed);
-Image gen_oceans(int size, int seed, float ocean_threshold);
+void gen_heightmap(int seed, size_t size, float * heightmap);
+void gen_terrain_image(float ocean_threshold, size_t size, const float * restrict heightmap, Color * pixel_colors);

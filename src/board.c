@@ -10,7 +10,7 @@
 
 #define FML_IMPL
 
-Image gen_raw_noise(int size, int seed) {
+void gen_heightmap(int seed, size_t size, float * heightmap) {
     fnl_state noise = fnlCreateState();
     noise.noise_type = FNL_NOISE_PERLIN;
     noise.seed = seed;
@@ -22,48 +22,28 @@ Image gen_raw_noise(int size, int seed) {
     noise.gain = 0.40f;
     noise.weighted_strength = -0.70f;
 
-    //! NOTE: This uses the heap
-    Image output = GenImageColor(size, size, BLACK);
+    size_t i = 0;
+    for(size_t y = 0; y < size; y++) {
+        for(size_t x = 0; x < size; x++, i++) {
+            float height = fnlGetNoise2D(&noise, x, y);
+            height += 1;
+            height /= 2.0f;
 
-    for(int y = 0; y < size; y++) {
-        for(int x = 0; x < size; x++) {
-            float noise_data = fnlGetNoise2D(&noise, x, y);
-            noise_data += 1;
-            noise_data /= 2.0f;
-            // Why not set this directly?
-            ImageDrawPixel(&output, x, y, Fade(RED, noise_data));
+            heightmap[i] = height;
         }
     }
-
-    return output;
 }
 
-//! TODO: ideally, this would take in an image or bunch of data instead of re-generating the noise; because we're using perlin, it should be the same, but it's needless performance baggage
-Image gen_oceans(int size, int seed, float ocean_threshold) {
-    fnl_state noise = fnlCreateState();
-    noise.noise_type = FNL_NOISE_PERLIN;
-    noise.seed = seed;
+void gen_terrain_image(float ocean_threshold, size_t size, const float * restrict heightmap, Color * pixel_colors) {
+    size_t pixel_count = size*size;
 
-    // cue the magic numbers - discovered while messing around with the fnl GUI
-    noise.fractal_type = FNL_FRACTAL_FBM;
-    noise.frequency = 0.005f;
-    noise.octaves = 6;
-    noise.gain = 0.40f;
-    noise.weighted_strength = -0.70f;
-
-    Image output = GenImageColor(size, size, BLACK);
-
-    for(int y = 0; y < size; y++) {
-        for(int x = 0; x < size; x++) {
-            float noise_data = fnlGetNoise2D(&noise, x, y);
-            noise_data += 1;
-            noise_data /= 2.0f;
-            if(noise_data > ocean_threshold)
-                ImageDrawPixel(&output, x, y, Fade(GREEN, noise_data));
-            else
-                ImageDrawPixel(&output, x, y, Fade(BLUE, noise_data));
+    for(size_t i = 0; i < pixel_count; i++) {
+        //! TODO: If the compiler can't optimize this branch well we may have to do some fuckery
+        float height = heightmap[i];
+        if(height > ocean_threshold) {
+            pixel_colors[i] = Fade(GREEN, height);
+        } else {
+            pixel_colors[i] = Fade(BLUE, height);
         }
     }
-
-    return output;
 }

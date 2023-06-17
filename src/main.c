@@ -42,19 +42,22 @@ int main(void) {
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     Texture2D board_texture = init_texture_with_size(X_PIXELS_COUNT, Y_PIXELS_COUNT);
+    Texture2D terrain_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
+
     SetTextureFilter(board_texture, TEXTURE_FILTER_POINT);
+    SetTextureFilter(terrain_texture, TEXTURE_FILTER_POINT);
 
     size_t map_state = MS_COUNTRY;
 
     int generation_seed = rand();
 
-    //! TODO: Make our own perlin noise algorithm or use another library, as this uses the heap along with not being able to set a seed
-    //! NOTE: This uses the heap
-    Image raw_noise_image = gen_raw_noise(BOARD_SIZE, generation_seed);
-    Image ocean_image = gen_oceans(BOARD_SIZE, generation_seed, 0.33f);
-    
-    Texture2D noise_texture = LoadTextureFromImage(raw_noise_image);
-    Texture2D ocean_texture = LoadTextureFromImage(ocean_image);
+    //! TODO: Rework
+    float * heightmap = malloc(BOARD_SIZE*BOARD_SIZE*sizeof(float));
+    Color * terrain_pixel_colors = malloc(BOARD_SIZE*BOARD_SIZE*sizeof(Color));
+
+    gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
+    gen_terrain_image(0.33f, BOARD_SIZE, heightmap, terrain_pixel_colors);
+    UpdateTexture(terrain_texture, terrain_pixel_colors);
 
     init_camera();
     init_map();
@@ -99,11 +102,9 @@ int main(void) {
             map_state %= 3;
 
             generation_seed++;
-            raw_noise_image = gen_raw_noise(BOARD_SIZE, generation_seed);
-            ocean_image = gen_oceans(BOARD_SIZE, generation_seed, 0.33f);
-
-            noise_texture = LoadTextureFromImage(raw_noise_image);
-            ocean_texture = LoadTextureFromImage(ocean_image);
+            gen_heightmap(generation_seed, BOARD_SIZE, heightmap);
+            gen_terrain_image(0.33f, BOARD_SIZE, heightmap, terrain_pixel_colors);
+            UpdateTexture(terrain_texture, terrain_pixel_colors);
         }
 
         update_camera();
@@ -118,9 +119,8 @@ int main(void) {
             BeginMode2D(camera);
                 ClearBackground(BLACK);
 
-                // DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
-                DrawTextureEx(noise_texture, (Vector2) { 0, 0 }, 0.0f, 1.5f, WHITE);
-                DrawTextureEx(ocean_texture, (Vector2) { BOARD_SIZE * 1.5f, 0 }, 0.0f, 1.5f, WHITE);
+                DrawTexturePro(board_texture, (Rectangle) { 0.0f, 0.0f, board_texture.width, board_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_WIDTH, BOARD_HEIGHT }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+                DrawTextureEx(terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
 
             EndMode2D();
             
