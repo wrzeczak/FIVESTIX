@@ -54,6 +54,8 @@ void update_board_terrain(int seed, float ocean_threshold) {
         }
     }
 
+    //! TODO: Scrap this and just calculate the gradient of the perlin noise when computing the noise
+
     // Gradient ascent to find high points
     // Upper bound in case algorithm doesnt stop
     Vector2 cur_pos = { 50.0f, 50.0f };
