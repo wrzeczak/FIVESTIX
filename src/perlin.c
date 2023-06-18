@@ -4,6 +4,7 @@
 #include "raymath.h"
 
 //! TODO: Rewrite this to be less bad
+//! TODO: Add comments too, this will soon not be understandable
 
 static float q(float t) {
     return _fnlInterpQuintic(t);

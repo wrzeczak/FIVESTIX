@@ -19,6 +19,12 @@ void init_board() {
 }
 
 void update_board_terrain(int seed, float ocean_threshold) {
+    size_t zero_gradient_points_count = 0;
+    struct {
+        size_t x;
+        size_t y;
+    } zero_gradient_points[256];
+
     float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;
 
@@ -42,7 +48,14 @@ void update_board_terrain(int seed, float ocean_threshold) {
                 height += 1;
                 height /= 2.0f;
 
+                if (Vector2Length(value.gradient) <= 0.05f && zero_gradient_points_count < 256) {
+                    zero_gradient_points[zero_gradient_points_count].x = x;
+                    zero_gradient_points[zero_gradient_points_count++].y = y;
+                }
+
                 heights[i] = height;
+
+                // pixel_colors[i] = (Color) { Vector2Length(value.gradient) * 255.0f, Vector2Length(value.gradient) * 255.0f, Vector2Length(value.gradient) * 255.0f, 255 };
 
                 if(height > ocean_threshold) {
                     pixel_colors[i] = Fade(GREEN, height);
@@ -53,49 +66,16 @@ void update_board_terrain(int seed, float ocean_threshold) {
         }
     }
 
-    //! TODO: Scrap this and just calculate the gradient of the perlin noise when computing the noise
-
-    // Gradient ascent to find high points
-    // Upper bound in case algorithm doesnt stop
-    // Vector2 cur_pos = { 50.0f, 50.0f };
-
-    // size_t index = 0;
-    // for(size_t iter = 0; iter < 1024; iter++) {
-    //     index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
-
-    //     // Don't want to go out of bounds, this also follows from all local maxima and minima not being on the edge of the heightmap
-    //     // Note that for unsigned integers, it can be the case that k >= n but not k + s >= n
-    //     if (index >= BOARD_PIXEL_COUNT || index + BOARD_SIZE >= BOARD_PIXEL_COUNT) {
-    //         index = -1;
-    //         break;
-    //     }
-
-    //     float height = heights[index];
-
-    //     Vector2 height_delta = { heights[index + 1] - height, heights[index + BOARD_SIZE] - height };
-
-    //     // Not really standard for gradient ascent afaik, but this makes it takes less steps
-    //     height_delta = Vector2Scale(height_delta, 32.0f);
-
-    //     cur_pos = Vector2Subtract(cur_pos, height_delta);
-
-    //     // printf("%f, %f\n", cur_pos.x, cur_pos.y);
-    // }
-
-    // if (index == -1) {
-    //     return;
-    // }
-
-    // // index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
-    
-    // {
-    //     for(size_t y = cur_pos.y; y <= cur_pos.y + 5 && y < BOARD_SIZE; y++) {
-    //         for (size_t x = cur_pos.x; x <= cur_pos.x + 5 && x < BOARD_SIZE; x++) {
-    //             size_t i = (y * BOARD_SIZE) + x;
-    //             pixel_colors[i] = RED;
-    //         }
-    //     }
-    // }
+    for (size_t i = 0; i < zero_gradient_points_count; i++) {
+        {
+            for(size_t y = zero_gradient_points[i].y; y <= zero_gradient_points[i].y + 2 && y < BOARD_SIZE; y++) {
+                for (size_t x = zero_gradient_points[i].x; x <= zero_gradient_points[i].x + 2 && x < BOARD_SIZE; x++) {
+                    size_t i = (y * BOARD_SIZE) + x;
+                    pixel_colors[i] = RED;
+                }
+            }
+        }
+    }
 }
 
 void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id) {
