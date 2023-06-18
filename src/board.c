@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "fastnoise.h"
-#define FML_IMPL
+// #define FNL_IMPL
+// #include "fastnoise.h"
 
 _Alignas(64) Board board;
 
@@ -24,35 +24,35 @@ void update_board_terrain(int seed, float ocean_threshold) {
     float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;
 
-    fnl_state noise = fnlCreateState();
-    noise.noise_type = FNL_NOISE_PERLIN;
-    noise.seed = seed;
+    // fnl_state noise = fnlCreateState();
+    // noise.noise_type = FNL_NOISE_PERLIN;
+    // noise.seed = seed;
 
-    // cue the magic numbers - discovered while messing around with the fnl GUI
-    noise.fractal_type = FNL_FRACTAL_FBM;
-    noise.frequency = 0.005f;
-    noise.octaves = 6;
-    noise.gain = 0.40f;
-    noise.weighted_strength = -0.70f;
+    // // cue the magic numbers - discovered while messing around with the fnl GUI
+    // noise.fractal_type = FNL_FRACTAL_FBM;
+    // noise.frequency = 0.005f;
+    // noise.octaves = 6;
+    // noise.gain = 0.40f;
+    // noise.weighted_strength = -0.70f;
 
-    {
-        size_t i = 0;
-        for(float y = 0; y < BOARD_SIZE; y++) {
-            for(float x = 0; x < BOARD_SIZE; x++, i++) {
-                float height = fnlGetNoise2D(&noise, x, y);
-                height += 1;
-                height /= 2.0f;
+    // {
+    //     size_t i = 0;
+    //     for(float y = 0; y < BOARD_SIZE; y++) {
+    //         for(float x = 0; x < BOARD_SIZE; x++, i++) {
+    //             float height = fnlGetNoise2D(&noise, x, y);
+    //             height += 1;
+    //             height /= 2.0f;
 
-                heights[i] = height;
+    //             heights[i] = height;
 
-                if(height > ocean_threshold) {
-                    pixel_colors[i] = Fade(GREEN, height);
-                } else {
-                    pixel_colors[i] = Fade(BLUE, height);
-                }
-            }
-        }
-    }
+    //             if(height > ocean_threshold) {
+    //                 pixel_colors[i] = Fade(GREEN, height);
+    //             } else {
+    //                 pixel_colors[i] = Fade(BLUE, height);
+    //             }
+    //         }
+    //     }
+    // }
 
     //! TODO: Scrap this and just calculate the gradient of the perlin noise when computing the noise
 
