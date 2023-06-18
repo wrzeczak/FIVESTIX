@@ -263,6 +263,9 @@ void fnlDomainWarp3D(fnl_state *state, FNLfloat *x, FNLfloat *y, FNLfloat *z);
 // Below this line is the implementation
 // ====================
 
+#endif // FASTNOISELITE_H
+#if defined(FNL_IMPL)
+
 // Constants
 
 static const float GRADIENTS_2D[] = 
@@ -2422,8 +2425,8 @@ void fnlDomainWarp3D(fnl_state *state, FNLfloat *x, FNLfloat *y, FNLfloat *z)
     }
 }
 
+#endif // FNL_IMPL
+
 #if defined(__cplusplus)
 }
 #endif
-
-#endif // FASTNOISELITE_H
