@@ -61,7 +61,7 @@ typedef struct {
     Vector2 gradient;
 } PerlinValue;
 
-static PerlinValue single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
+static PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
     int x0 = _fnlFastFloor(x);
     int y0 = _fnlFastFloor(y);
 
@@ -98,6 +98,38 @@ static PerlinValue single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
         .height = height,
         .gradient = (Vector2) { perlin_grad_x, perlin_grad_y }
     };
+}
+
+static PerlinValue get_fractal_perlin_noise(fnl_state *state, FNLfloat x, FNLfloat y) {
+    float x_orig = x;
+    float y_orig = y;
+
+    int seed = state->seed;
+    PerlinValue sum = {
+        .height = 0,
+        .gradient = (Vector2) { 0, 0 }
+    };
+    float amp = _fnlCalculateFractalBounding(state);
+
+    for (int i = 0; i < state->octaves; i++)
+    {
+        PerlinValue value = get_single_perlin_2d(seed++, x, y);
+        float noise = value.height;
+        sum.height += noise * amp;
+
+        Vector2 gradient = value.gradient;
+        gradient.x *= (x / x_orig);
+        gradient.y *= (y / y_orig);
+
+        sum.gradient = Vector2Add(sum.gradient, Vector2Scale(gradient, amp));
+        amp *= _fnlLerp(1.0f, _fnlFastMin(noise + 1, 2) * 0.5f, state->weighted_strength);
+
+        x *= state->lacunarity;
+        y *= state->lacunarity;
+        amp *= state->gain;
+    }
+
+    return sum;
 }
 
 int main(void) {
@@ -157,11 +189,22 @@ int main(void) {
     {
         Color * pixel_colors = malloc(1024*1024*sizeof(Color));
         Color * pixel_colors_1 = malloc(1024*1024*sizeof(Color));
+
+        fnl_state noise = fnlCreateState();
+        noise.noise_type = FNL_NOISE_PERLIN;
+        noise.seed = generation_seed;
+
+        // cue the magic numbers - discovered while messing around with the fnl GUI
+        noise.fractal_type = FNL_FRACTAL_FBM;
+        noise.frequency = 0.005f;
+        noise.octaves = 6;
+        noise.gain = 0.40f;
+        noise.weighted_strength = -0.70f;
         {
             size_t i = 0;
             for(float y = 0; y < 1024; y++) {
                 for(float x = 0; x < 1024; x++, i++) {
-                    PerlinValue val = single_perlin_2d(0, x/16.0f, y/16.0f);
+                    PerlinValue val = get_fractal_perlin_noise(&noise, x/16.0f, y/16.0f);
 
                     float height = val.height;
                     height += 1;
