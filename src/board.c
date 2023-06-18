@@ -1,11 +1,9 @@
 #include "board.h"
+#include "perlin.h"
 #include "raymath.h"
 #include <stdalign.h>
 #include <string.h>
 #include <stdio.h>
-
-#include "fastnoise.h"
-#define FML_IMPL
 
 _Alignas(64) Board board;
 
@@ -21,6 +19,12 @@ void init_board() {
 }
 
 void update_board_terrain(int seed, float ocean_threshold) {
+    size_t high_points_count = 0;
+    struct {
+        size_t x;
+        size_t y;
+    } high_points[256];
+
     float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;
 
@@ -39,11 +43,19 @@ void update_board_terrain(int seed, float ocean_threshold) {
         size_t i = 0;
         for(float y = 0; y < BOARD_SIZE; y++) {
             for(float x = 0; x < BOARD_SIZE; x++, i++) {
-                float height = fnlGetNoise2D(&noise, x, y);
+                PerlinValue value = get_fractal_perlin_noise(&noise, x, y);
+                float height = value.height;
                 height += 1;
                 height /= 2.0f;
+            
+                if(height >= 0.5f && high_points_count < 256 && Vector2Length(value.gradient) <= 0.1f) {
+                    high_points[high_points_count].x = x;
+                    high_points[high_points_count++].y = y;
+                }
 
                 heights[i] = height;
+
+                // pixel_colors[i] = (Color) { height * 255.0f, height * 255.0f, height * 255.0f, 255 };
 
                 if(height > ocean_threshold) {
                     pixel_colors[i] = Fade(GREEN, height);
@@ -54,47 +66,51 @@ void update_board_terrain(int seed, float ocean_threshold) {
         }
     }
 
-    //! TODO: Scrap this and just calculate the gradient of the perlin noise when computing the noise
+    // Set seed for bad-ish river algorithm
+    srand(seed);
 
-    // Gradient ascent to find high points
-    // Upper bound in case algorithm doesnt stop
-    Vector2 cur_pos = { 50.0f, 50.0f };
+    // Take the high points and make rivers
+    for(size_t i = 0; i < high_points_count; i++) {
+        size_t x = high_points[i].x;
+        size_t y = high_points[i].y;
 
-    size_t index = 0;
-    for(size_t iter = 0; iter < 1024; iter++) {
-        index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
+        for(size_t j = 0; j < 128; j++) {
+            //! TODO: This is probably bad
 
-        // Don't want to go out of bounds, this also follows from all local maxima and minima not being on the edge of the heightmap
-        // Note that for unsigned integers, it can be the case that k >= n but not k + s >= n
-        if (index >= BOARD_PIXEL_COUNT || index + BOARD_SIZE >= BOARD_PIXEL_COUNT) {
-            index = -1;
-            break;
-        }
+            size_t index = (y * BOARD_SIZE) + x;
 
-        float height = heights[index];
+            // Find the nearest lowest point
+            float comp_height0 = x + 1 < BOARD_SIZE ? heights[index + 1] : 2.0f;
+            float comp_height1 = x - 1 < BOARD_SIZE ? heights[index - 1] : 2.0f;
+            float comp_height2 = y + 1 < BOARD_SIZE ? heights[index + BOARD_SIZE] : 2.0f;
+            float comp_height3 = y - 1 < BOARD_SIZE ? heights[index - BOARD_SIZE] : 2.0f;
 
-        Vector2 height_delta = { heights[index + 1] - height, heights[index + BOARD_SIZE] - height };
-
-        // Not really standard for gradient ascent afaik, but this makes it takes less steps
-        height_delta = Vector2Scale(height_delta, 32.0f);
-
-        cur_pos = Vector2Subtract(cur_pos, height_delta);
-
-        // printf("%f, %f\n", cur_pos.x, cur_pos.y);
-    }
-
-    if (index == -1) {
-        return;
-    }
-
-    // index = (cur_pos.y * BOARD_SIZE) + cur_pos.x;
-    
-    {
-        for(size_t y = cur_pos.y; y <= cur_pos.y + 5 && y < BOARD_SIZE; y++) {
-            for (size_t x = cur_pos.x; x <= cur_pos.x + 5 && x < BOARD_SIZE; x++) {
-                size_t i = (y * BOARD_SIZE) + x;
-                pixel_colors[i] = RED;
+            if(comp_height0 <= comp_height1 && comp_height0 <= comp_height2 && comp_height0 <= comp_height3 && comp_height0 != 2.0f) {
+                x++;
+                pixel_colors[index] = BLUE;
+                continue;
             }
+
+            if(comp_height1 <= comp_height2 && comp_height1 <= comp_height3 && comp_height1 != 2.0f) {
+                x--;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            if(comp_height2 <= comp_height3 && comp_height2 != 2.0f) {
+                y++;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            if(comp_height3 != 2.0f) {
+                y--;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            // We have only higher points around us, stop
+            break;
         }
     }
 }

@@ -43,7 +43,7 @@ int main(void) {
     int generation_seed = 0;
 
     clock_t generation_start_clock = clock();
-    update_board_terrain(generation_seed, 0.33f);
+    update_board_terrain(generation_seed, 0.5f);
     clock_t generation_end_clock = clock();
 
     clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
@@ -116,6 +116,9 @@ int main(void) {
                 DrawTexturePro(map_texture, (Rectangle) { 0.0f, 0.0f, map_texture.width, map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
                 DrawTextureEx(terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
 
+                // Draw perlin noise tests
+
+                
             EndMode2D();
             
             DrawText(TextFormat("GEN: %ld", generation_clock_cycles), 10, GetRenderHeight() - 70, 20, GREEN);
