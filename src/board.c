@@ -19,11 +19,11 @@ void init_board() {
 }
 
 void update_board_terrain(int seed, float ocean_threshold) {
-    size_t zero_gradient_points_count = 0;
+    size_t high_points_count = 0;
     struct {
         size_t x;
         size_t y;
-    } zero_gradient_points[256];
+    } high_points[256];
 
     float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;
@@ -47,15 +47,15 @@ void update_board_terrain(int seed, float ocean_threshold) {
                 float height = value.height;
                 height += 1;
                 height /= 2.0f;
-
-                if (Vector2Length(value.gradient) <= 0.05f && zero_gradient_points_count < 256) {
-                    zero_gradient_points[zero_gradient_points_count].x = x;
-                    zero_gradient_points[zero_gradient_points_count++].y = y;
+            
+                if(height >= 0.5f && high_points_count < 256 && Vector2Length(value.gradient) <= 0.1f) {
+                    high_points[high_points_count].x = x;
+                    high_points[high_points_count++].y = y;
                 }
 
                 heights[i] = height;
 
-                // pixel_colors[i] = (Color) { Vector2Length(value.gradient) * 255.0f, Vector2Length(value.gradient) * 255.0f, Vector2Length(value.gradient) * 255.0f, 255 };
+                // pixel_colors[i] = (Color) { height * 255.0f, height * 255.0f, height * 255.0f, 255 };
 
                 if(height > ocean_threshold) {
                     pixel_colors[i] = Fade(GREEN, height);
@@ -66,14 +66,51 @@ void update_board_terrain(int seed, float ocean_threshold) {
         }
     }
 
-    for (size_t i = 0; i < zero_gradient_points_count; i++) {
-        {
-            for(size_t y = zero_gradient_points[i].y; y <= zero_gradient_points[i].y + 2 && y < BOARD_SIZE; y++) {
-                for (size_t x = zero_gradient_points[i].x; x <= zero_gradient_points[i].x + 2 && x < BOARD_SIZE; x++) {
-                    size_t i = (y * BOARD_SIZE) + x;
-                    pixel_colors[i] = RED;
-                }
+    // Set seed for bad-ish river algorithm
+    srand(seed);
+
+    // Take the high points and make rivers
+    for(size_t i = 0; i < high_points_count; i++) {
+        size_t x = high_points[i].x;
+        size_t y = high_points[i].y;
+
+        for(size_t j = 0; j < 128; j++) {
+            //! TODO: This is probably bad
+
+            size_t index = (y * BOARD_SIZE) + x;
+
+            // Find the nearest lowest point
+            float comp_height0 = x + 1 < BOARD_SIZE ? heights[index + 1] : 2.0f;
+            float comp_height1 = x - 1 < BOARD_SIZE ? heights[index - 1] : 2.0f;
+            float comp_height2 = y + 1 < BOARD_SIZE ? heights[index + BOARD_SIZE] : 2.0f;
+            float comp_height3 = y - 1 < BOARD_SIZE ? heights[index - BOARD_SIZE] : 2.0f;
+
+            if(comp_height0 <= comp_height1 && comp_height0 <= comp_height2 && comp_height0 <= comp_height3 && comp_height0 != 2.0f) {
+                x++;
+                pixel_colors[index] = BLUE;
+                continue;
             }
+
+            if(comp_height1 <= comp_height2 && comp_height1 <= comp_height3 && comp_height1 != 2.0f) {
+                x--;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            if(comp_height2 <= comp_height3 && comp_height2 != 2.0f) {
+                y++;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            if(comp_height3 != 2.0f) {
+                y--;
+                pixel_colors[index] = BLUE;
+                continue;
+            }
+
+            // We have only higher points around us, stop
+            break;
         }
     }
 }

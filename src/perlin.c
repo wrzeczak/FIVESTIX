@@ -93,8 +93,7 @@ PerlinValue get_fractal_perlin_noise(fnl_state * state, FNLfloat x, FNLfloat y) 
     };
     float amp = _fnlCalculateFractalBounding(state);
 
-    for (int i = 0; i < state->octaves; i++)
-    {
+    for(int i = 0; i < state->octaves; i++) {
         PerlinValue value = get_single_perlin_2d(seed++, x, y);
         float noise = value.height;
         sum.height += noise * amp;

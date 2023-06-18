@@ -43,7 +43,7 @@ int main(void) {
     int generation_seed = 0;
 
     clock_t generation_start_clock = clock();
-    update_board_terrain(generation_seed, 0.33f);
+    update_board_terrain(generation_seed, 0.5f);
     clock_t generation_end_clock = clock();
 
     clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
