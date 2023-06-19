@@ -42,7 +42,7 @@ static GradCoord get_grad_coord(int seed, int x_primed, int y_primed, float xd, 
     return coord;
 }
 
-PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
+static PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
     int x0 = _fnlFastFloor(x);
     int y0 = _fnlFastFloor(y);
 

@@ -7,4 +7,4 @@ typedef struct {
     Vector2 gradient;
 } PerlinValue;
 
-PerlinValue get_fractal_perlin_noise(fnl_state * state, FNLfloat x, FNLfloat y);
+static PerlinValue get_fractal_perlin_noise(fnl_state * state, FNLfloat x, FNLfloat y);

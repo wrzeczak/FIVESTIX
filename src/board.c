@@ -1,5 +1,6 @@
 #include "board.h"
 #include "perlin.h"
+#include "perlin.inl"
 #include "raymath.h"
 #include <stdalign.h>
 #include <string.h>
