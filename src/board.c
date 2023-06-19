@@ -80,6 +80,7 @@ void update_board_terrain(int seed, float ocean_threshold) {
             //! TODO: Ideas for river algorithm to improve it:
             // Add a bit of randomness to which direction it picks (i.e not always the lowest)
             // As mentioned above, it may be lead to better results to scrap the gradient thing and just randomly find points above a certain height, certainly would be a lot faster
+            // Make the rivers larger to allow for nice variation
 
             size_t index = (y * BOARD_SIZE) + x;
 
