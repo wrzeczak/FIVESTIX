@@ -7,22 +7,21 @@
 //! TODO: Rewrite this to be less bad
 //! TODO: Add comments too, this will soon not be understandable
 
-static float q(float t) {
-    return _fnlInterpQuintic(t);
+// Derivative of 6t^{5}-15t^{4}+10t^{3}, which is the function that the fnl library uses for quintic interpolation
+static float quintic_interpolation_derivative(float t) {
+    return (t*t)*(30*(t*t) + 30) - 60*(t*t*t);
 }
 
-// Derivative of 6t^{5}-15t^{4}+10t^{3}
-static float qd(float t) {
-    return 30*(t*t*t*t) - 60*(t*t*t) + 30*(t*t);
-}
-
-static float get_perlin_grad_x(float x, float y, float qx, float qy, float qdx, float k0, float k2, float k4, float k6, float g0, float g1, float g2, float g3) {
+// These functions get the partial derivatives for the perlin noise (mathematical) function, all parameters except x and y are constants that stay the same across a single noise cell (and the noise is continuous with other cells? its magic i guess)
+static float get_perlin_derivative_x(float x, float y, float qx, float qy, float qdx, float k0, float k2, float k4, float k6, float g0, float g1, float g2, float g3) {
     return k0+qdx*(g1-g0)+qx*(k2-k0)+qy*((k4+qdx*(g3-g2)+qx*(k6-k4))-k0-qdx*(g1-g0)-qx*(k2-k0));
 }
 
-static float get_perlin_grad_y(float x, float y, float qx, float qy, float qdy, float k1, float k3, float k5, float k7, float g0, float g1, float g2, float g3) {
+static float get_perlin_derivative_y(float x, float y, float qx, float qy, float qdy, float k1, float k3, float k5, float k7, float g0, float g1, float g2, float g3) {
     return k1+qx*(k3-k1)+(qdy)*((g2+qx*(g3-g2))-g0-qx*(g1-g0))+qy*(k5+qx*(k7-k5)-k1-qx*(k3-k1));
 }
+
+//
 
 typedef struct {
     float k0;
@@ -30,8 +29,9 @@ typedef struct {
     float g;
 } GradCoord;
 
-static GradCoord get_grad_coord(int seed, int xPrimed, int yPrimed, float xd, float yd) {
-    int hash = _fnlHash2D(seed, xPrimed, yPrimed);
+// Not sure what they meant by grad coord but this is a reimplementation of fnl's gradcoord function but returns the constants as well
+static GradCoord get_grad_coord(int seed, int x_primed, int y_primed, float xd, float yd) {
+    int hash = _fnlHash2D(seed, x_primed, y_primed);
     hash ^= hash >> 15;
     hash &= 127 << 1;
 
@@ -53,8 +53,8 @@ PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
 
     float qx = _fnlInterpQuintic(xd0);
     float qy = _fnlInterpQuintic(yd0);
-    float qdx = qd(xd0);
-    float qdy = qd(yd0);
+    float qdx = quintic_interpolation_derivative(xd0);
+    float qdy = quintic_interpolation_derivative(yd0);
 
     x0 *= PRIME_X;
     y0 *= PRIME_Y;
@@ -72,8 +72,8 @@ PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
     float xf1 = _fnlLerp(g2, g3, qx);
 
     float height = _fnlLerp(xf0, xf1, qy) * 1.4247691104677813f;
-    float perlin_grad_x = get_perlin_grad_x(xd0, yd0, qx, qy, qdx, k0, k2, k4, k6, g0, g1, g2, g3) * 1.4247691104677813f;
-    float perlin_grad_y = get_perlin_grad_y(xd0, yd0, qx, qy, qdy, k1, k3, k5, k7, g0, g1, g2, g3) * 1.4247691104677813f;
+    float perlin_grad_x = get_perlin_derivative_x(xd0, yd0, qx, qy, qdx, k0, k2, k4, k6, g0, g1, g2, g3) * 1.4247691104677813f;
+    float perlin_grad_y = get_perlin_derivative_y(xd0, yd0, qx, qy, qdy, k1, k3, k5, k7, g0, g1, g2, g3) * 1.4247691104677813f;
 
     // printf("k_0=%f\nk_1=%f\nk_2=%f\nk_3=%f\nk_4=%f\nk_5=%f\nk_6=%f\nk_7=%f\n%f,%f,%f,%f\n", k0, k1, k2, k3, k4, k5, k6, k7, xd0, yd0, height,perlin_grad_x);
 
