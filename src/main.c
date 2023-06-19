@@ -48,6 +48,9 @@ int main(void) {
 
     clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
 
+    size_t total_generation_count = 1;
+    clock_t total_generation_clock_cycles = generation_clock_cycles;
+
     UpdateTexture(terrain_texture, board.terrain_pixel_colors);
 
     init_camera();
@@ -97,6 +100,8 @@ int main(void) {
             update_board_terrain(generation_seed, 0.33f);
             generation_end_clock = clock();
             generation_clock_cycles = generation_end_clock - generation_start_clock;
+            total_generation_clock_cycles += generation_clock_cycles;
+            total_generation_count++;
 
             UpdateTexture(terrain_texture, board.terrain_pixel_colors);
         }
@@ -121,6 +126,7 @@ int main(void) {
                 
             EndMode2D();
             
+            DrawText(TextFormat("T_GEN: %ld, %ld", total_generation_clock_cycles, total_generation_count), 10, GetRenderHeight() - 90, 20, GREEN);
             DrawText(TextFormat("GEN: %ld", generation_clock_cycles), 10, GetRenderHeight() - 70, 20, GREEN);
             DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
 
