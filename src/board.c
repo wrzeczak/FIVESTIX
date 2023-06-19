@@ -50,7 +50,7 @@ void update_board_terrain(int seed, float ocean_threshold) {
                 height += 1;
                 height /= 2.0f;
             
-                if(height >= 0.5f && high_points_count < 256 && Vector2Length(value.gradient) <= 0.1f) {
+                if(height >= 0.5f && high_points_count < 256 && Vector2Length(value.gradient) <= 0.05f) {
                     high_points[high_points_count].x = x;
                     high_points[high_points_count++].y = y;
                 }

@@ -86,9 +86,6 @@ static PerlinValue get_single_perlin_2d(int seed, FNLfloat x, FNLfloat y) {
 PerlinValue get_fractal_perlin_noise(fnl_state * state, FNLfloat x, FNLfloat y) {
     _fnlTransformNoiseCoordinate2D(state, &x, &y);
 
-    float x_orig = x;
-    float y_orig = y;
-
     int seed = state->seed;
     PerlinValue sum = {
         .height = 0,
@@ -101,11 +98,7 @@ PerlinValue get_fractal_perlin_noise(fnl_state * state, FNLfloat x, FNLfloat y) 
         float noise = value.height;
         sum.height += noise * amp;
 
-        Vector2 gradient = value.gradient;
-        gradient.x *= (x / x_orig);
-        gradient.y *= (y / y_orig);
-
-        sum.gradient = Vector2Add(sum.gradient, Vector2Scale(gradient, amp));
+        sum.gradient = Vector2Add(sum.gradient, Vector2Scale(value.gradient, amp));
         amp *= _fnlLerp(1.0f, _fnlFastMin(noise + 1, 2) * 0.5f, state->weighted_strength);
 
         x *= state->lacunarity;
