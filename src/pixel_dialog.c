@@ -11,7 +11,7 @@
 void update_pixel_dialog(void) {
     Vector2 world_mouse_pos = Vector2Add(GetMousePosition(), camera.target);
 
-    if (world_mouse_pos.x < 0.0f || world_mouse_pos.y < 0.0f) {
+    if(world_mouse_pos.x < 0.0f || world_mouse_pos.y < 0.0f) {
         return;
     }
 
@@ -20,7 +20,7 @@ void update_pixel_dialog(void) {
     size_t x = world_mouse_pos.x;
     size_t y = world_mouse_pos.y;
 
-    if (x >= BOARD_SIZE || y >= BOARD_SIZE) {
+    if(x >= BOARD_SIZE || y >= BOARD_SIZE) {
         return;
     }
 

@@ -1,11 +1,10 @@
 #include "board.h"
-#include "pixel_attrib.h"
 #include "consts.h"
 #include "camera.h"
-#include "ext.h"
 #include "fullscreen.h"
 #include "pixel_dialog.h"
 #include "temp_init.h"
+#include "render.h"
 
 #include "raylib.h"
 #include <stdarg.h>
@@ -15,9 +14,10 @@
 #include <stdio.h>
 #include <stdalign.h>
 
+//! TODO: Move a bunch of implementations of commonly used together variables to the same translation unit for better cache usage
+
 int main(void) {
     //! TODO: Refactor due for main, we should move a lot of this stuff into their own files because main is very cluttered right now
-
     srand(time(NULL));
 
     InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
@@ -25,11 +25,7 @@ int main(void) {
     // Enable vsync
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    Texture2D map_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
-    Texture2D terrain_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
-
-    SetTextureFilter(map_texture, TEXTURE_FILTER_POINT);
-    SetTextureFilter(terrain_texture, TEXTURE_FILTER_POINT);
+    init_render();
 
     size_t map_state = MS_COUNTRY;
 
@@ -46,7 +42,7 @@ int main(void) {
     size_t total_generation_count = 1;
     clock_t total_generation_clock_cycles = generation_clock_cycles;
 
-    UpdateTexture(terrain_texture, board.terrain_pixel_colors);
+    UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
 
     init_camera();
     init_board();
@@ -75,7 +71,7 @@ int main(void) {
             total_generation_clock_cycles += generation_clock_cycles;
             total_generation_count++;
 
-            UpdateTexture(terrain_texture, board.terrain_pixel_colors);
+            UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
         }
 
         // Not sure whether to handle mouseover before or after camera position update, putting it here for now
@@ -89,25 +85,9 @@ int main(void) {
         clock_t render_start_clock = clock();
         //! WARN: May need to enter texture mode if we add more textures in the future
         //! NOTE: Pretty confident above comment is not an issue
-        UpdateTexture(map_texture, board.map_pixel_colors_arrays[map_state]);
+        UpdateTexture(board_map_texture, board.map_pixel_colors_arrays[map_state]);
 
-        BeginDrawing();
-
-            BeginMode2D(camera);
-                ClearBackground(BLACK);
-
-                DrawTexturePro(map_texture, (Rectangle) { 0.0f, 0.0f, map_texture.width, map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
-                DrawTextureEx(terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
-                
-            EndMode2D();
-            
-            DrawText(TextFormat("T_GEN: %ld, %ld", total_generation_clock_cycles, total_generation_count), 10, GetRenderHeight() - 90, 20, GREEN);
-            DrawText(TextFormat("GEN: %ld", generation_clock_cycles), 10, GetRenderHeight() - 70, 20, GREEN);
-            DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
-
-            DrawFPS(10, GetRenderHeight() - 25);
-
-        EndDrawing();
+        render_game(total_generation_clock_cycles, total_generation_count, generation_clock_cycles, render_clock_cycles);
 
         clock_t render_end_clock = clock();
         render_clock_cycles = render_end_clock - render_start_clock;
