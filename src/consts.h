@@ -13,3 +13,8 @@
 //
 
 #define BOARD_MAP_STATES_COUNT 3
+
+#define NULL_UCHAR (unsigned char)-1
+#define NULL_USHORT (unsigned short)-1
+#define NULL_UINT (unsigned int)-1
+#define NULL_ULONG (unsigned long)-1

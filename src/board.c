@@ -9,7 +9,14 @@
 _Alignas(64) Board board;
 
 void init_board() {
-    memset(&board.ids, 0, sizeof(board.ids));
+    for(size_t i = 0; i < BOARD_PIXEL_COUNT; i++) {
+        // memset(&board.ids, 0, sizeof(board.ids));
+        board.ids[i] = (BoardPixelId) {
+            NULL_USHORT,
+            NULL_USHORT,
+            NULL_USHORT
+        };
+    }
 
     for(size_t i = 0; i < BOARD_MAP_STATES_COUNT; i++) {
         Color * pixel_colors = board.map_pixel_colors_arrays[i];
@@ -19,12 +26,13 @@ void init_board() {
     }
 }
 
+_Alignas(64) static struct {
+    size_t x;
+    size_t y;
+} high_points[256];
+
 void update_board_terrain(int seed, float ocean_threshold) {
     size_t high_points_count = 0;
-    struct {
-        size_t x;
-        size_t y;
-    } high_points[256];
 
     float * heights = board.terrain_heights;
     Color * pixel_colors = board.terrain_pixel_colors;

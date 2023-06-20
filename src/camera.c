@@ -4,7 +4,8 @@
 
 #define MOVE_SPEED 25.0f
 
-Camera2D camera;
+//! TODO: Not super important at the moment but don't use this type because it wastes a good chunk of the cacheline, not enough to be a problem now though
+_Alignas(64) Camera2D camera;
 static Vector2 camera_velocity = { 0.0f, 0.0f };
 
 // Not really necessary could be initialized globally
