@@ -27,6 +27,7 @@ typedef struct {
     _Alignas(64) Color map_pixel_colors_arrays[BOARD_MAP_STATES_COUNT][BOARD_PIXEL_COUNT];
 
     _Alignas(64) float terrain_heights[BOARD_PIXEL_COUNT];
+    _Alignas(64) Vector2 terrain_gradients[BOARD_PIXEL_COUNT];
     _Alignas(64) Color terrain_pixel_colors[BOARD_PIXEL_COUNT];
 
     // Pixel id information, maybe split into seperate arrays in the future if needed
@@ -40,3 +41,5 @@ void init_board(void);
 void update_board_terrain(int seed, float ocean_threshold);
 // This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
 void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id);
+
+#define GET_BOARD_INDEX(X, Y) (((Y) * BOARD_SIZE) + (X))

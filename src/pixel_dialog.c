@@ -23,7 +23,7 @@ PixelDialog get_pixel_dialog(void) {
         return (PixelDialog) { NULL };
     }
 
-    BoardPixelId id = board.ids[(y * BOARD_SIZE) + x];
+    BoardPixelId id = board.ids[GET_BOARD_INDEX(x, y)];
 
     //! TODO: Probably should implement bounds checks here so we never read erroneous memory
     return (PixelDialog) {
