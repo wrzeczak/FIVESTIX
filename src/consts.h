@@ -18,3 +18,6 @@
 #define NULL_USHORT (unsigned short)-1
 #define NULL_UINT (unsigned int)-1
 #define NULL_ULONG (unsigned long)-1
+
+#define WINDOWED_SCREEN_WIDTH 1280
+#define WINDOWED_SCREEN_HEIGHT 720

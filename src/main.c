@@ -1,12 +1,13 @@
-#include "raylib.h"
-
 #include "board.h"
 #include "pixel_attrib.h"
 #include "consts.h"
 #include "camera.h"
 #include "ext.h"
-#include "raymath.h"
+#include "fullscreen.h"
+#include "pixel_dialog.h"
+#include "temp_init.h"
 
+#include "raylib.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,18 +15,8 @@
 #include <stdio.h>
 #include <stdalign.h>
 
-static size_t get_index(Vector2 pos) {
-    return (pos.y * BOARD_SIZE) + pos.x;
-}
-
-#define WINDOWED_SCREEN_WIDTH 1280
-#define WINDOWED_SCREEN_HEIGHT 720
-
 int main(void) {
     //! TODO: Refactor due for main, we should move a lot of this stuff into their own files because main is very cluttered right now
-
-    // Using seperate bool for fullscreen since if you toggle the fullscreen without setting window size first it messes with your monitor resolution
-    bool fullscreen = false;
 
     srand(time(NULL));
 
@@ -62,19 +53,7 @@ int main(void) {
 
     // At the moment the order of initialization before here for everything is irrelevant
 
-    country_display_names[0] = "TestCountry";
-    culture_display_names[0] = "TestCulture";
-    language_display_names[0] = "TestLanguage";
-
-    set_board_map_pixel_state(get_index((Vector2) { 0, 0 }), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
-    set_board_map_pixel_state(get_index((Vector2) { 10, 10 }), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
-    set_board_map_pixel_state(get_index((Vector2) { 10, 5 }), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
+    temp_init_game();
 
     clock_t render_clock_cycles = 0;
     
@@ -82,24 +61,7 @@ int main(void) {
 
         // Handle inputs
 
-        // Ugly hack, unless you know how to make fullscreen work correctly do not touch this
-        if(IsKeyPressed(KEY_F11)) {
-            fullscreen = !fullscreen;
-            int width;
-            int height;
-            if(fullscreen) {
-                int monitor = GetCurrentMonitor();
-                width = GetMonitorWidth(monitor);
-                height = GetMonitorHeight(monitor);
-            } else {
-                width = WINDOWED_SCREEN_WIDTH;
-                height = WINDOWED_SCREEN_HEIGHT;
-            }
-            // Doing this twice because it doesnt work if only done once
-            SetWindowSize(width, height);
-            ToggleFullscreen();
-            SetWindowSize(width, height);
-        }
+        update_fullscreen();
 
         if(IsKeyPressed(KEY_SPACE)) {
             map_state++;
@@ -117,24 +79,7 @@ int main(void) {
         }
 
         // Not sure whether to handle mouseover before or after camera position update, putting it here for now
-        Vector2 world_mouse_pos = Vector2Add(GetMousePosition(), camera.target);
-        if (world_mouse_pos.x >= 0.0f && world_mouse_pos.y >= 0.0f) {
-            world_mouse_pos.x /= BOARD_PIXEL_SIZE;
-            world_mouse_pos.y /= BOARD_PIXEL_SIZE;
-            size_t x = world_mouse_pos.x;
-            size_t y = world_mouse_pos.y;
-
-            if (x < BOARD_SIZE && y < BOARD_SIZE) {
-                BoardPixelId id = board.ids[(y * BOARD_SIZE) + x];
-
-                // //! TODO: Probably should implement bounds checks here so we never read erroneous memory
-                const char* country_display_name = id.country_id != NULL_USHORT ? country_display_names[id.country_id] : "None";
-                const char* culture_display_name = id.culture_id != NULL_USHORT ? country_display_names[id.culture_id] : "None";
-                const char* language_display_name = id.language_id != NULL_USHORT ? country_display_names[id.language_id] : "None";
-
-                printf("Country: %s\nCulture: %s\nLanguage: %s\n", country_display_name, culture_display_name, language_display_name);
-            }
-        }
+        update_pixel_dialog();
 
         update_camera();
 

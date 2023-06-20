@@ -35,7 +35,7 @@ typedef struct {
 // Global variable used because theres only one board
 extern Board board;
 
-void init_board();
+void init_board(void);
 void update_board_terrain(int seed, float ocean_threshold);
 // This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
 void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id);

@@ -8,7 +8,7 @@
 
 _Alignas(64) Board board;
 
-void init_board() {
+void init_board(void) {
     for(size_t i = 0; i < BOARD_PIXEL_COUNT; i++) {
         // memset(&board.ids, 0, sizeof(board.ids));
         board.ids[i] = (BoardPixelId) {
