@@ -74,10 +74,10 @@ int main(void) {
             UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
         }
 
-        // Not sure whether to handle mouseover before or after camera position update, putting it here for now
-        update_pixel_dialog();
-
         update_camera();
+
+        // Putting after camera update since it renders where the mouse is in the window
+        PixelDialog pixel_dialog = get_pixel_dialog();
 
         //
 
@@ -87,7 +87,7 @@ int main(void) {
         //! NOTE: Pretty confident above comment is not an issue
         UpdateTexture(board_map_texture, board.map_pixel_colors_arrays[map_state]);
 
-        render_game(total_generation_clock_cycles, total_generation_count, generation_clock_cycles, render_clock_cycles);
+        render_game(total_generation_clock_cycles, total_generation_count, generation_clock_cycles, render_clock_cycles, pixel_dialog);
 
         clock_t render_end_clock = clock();
         render_clock_cycles = render_end_clock - render_start_clock;
