@@ -5,6 +5,7 @@
 #pragma once
 #include "consts.h"
 #include "raylib.h"
+#include "types.h"
 #include <stdlib.h>
 
 typedef enum {
@@ -14,9 +15,9 @@ typedef enum {
 } BoardMapState;
 
 typedef struct {
-    unsigned short country_id;
-    unsigned short culture_id;
-    unsigned short language_id;
+    ushort country_id;
+    ushort culture_id;
+    ushort language_id;
 } BoardPixelId;
 
 // Using SoA here as to cut down on cacheline usage
