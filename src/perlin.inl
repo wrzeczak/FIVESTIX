@@ -4,7 +4,6 @@
 #include "raymath.h"
 #include <stdio.h>
 
-//! TODO: Rewrite this to be less bad
 //! TODO: Add comments too, this will soon not be understandable
 
 // Derivative of 6t^{5}-15t^{4}+10t^{3}, which is the function that the fnl library uses for quintic interpolation

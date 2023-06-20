@@ -17,7 +17,6 @@
 //! TODO: Move a bunch of implementations of commonly used together variables to the same translation unit for better cache usage
 
 int main(void) {
-    //! TODO: Refactor due for main, we should move a lot of this stuff into their own files because main is very cluttered right now
     srand(time(NULL));
 
     InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
