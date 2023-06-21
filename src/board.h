@@ -26,8 +26,6 @@ typedef struct {
     // One array of colors for each map state
     _Alignas(64) Color map_pixel_colors_arrays[BOARD_MAP_STATES_COUNT][BOARD_PIXEL_COUNT];
 
-    _Alignas(64) float terrain_heights[BOARD_PIXEL_COUNT];
-    _Alignas(64) Vector2 terrain_gradients[BOARD_PIXEL_COUNT];
     _Alignas(64) Color terrain_pixel_colors[BOARD_PIXEL_COUNT];
 
     // Pixel id information, maybe split into seperate arrays in the future if needed
