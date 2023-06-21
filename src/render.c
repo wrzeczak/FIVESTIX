@@ -16,7 +16,7 @@ void init_render(void) {
     SetTextureFilter(board_terrain_texture, TEXTURE_FILTER_POINT);
 }
 
-void render_game(clock_t total_generation_clock_cycles, clock_t total_generation_count, clock_t generation_clock_cycles, clock_t render_clock_cycles, PixelDialog pixel_dialog) {
+void render_game(double total_generation_duration, size_t total_generation_count, double generation_duration, double render_duration, PixelDialog pixel_dialog) {
     BeginDrawing();
 
         BeginMode2D(camera);
@@ -34,9 +34,9 @@ void render_game(clock_t total_generation_clock_cycles, clock_t total_generation
             DrawText(TextFormat("Country: %s\nCulture: %s\nLanguage: %s", pixel_dialog.country_display_name, pixel_dialog.culture_display_name, pixel_dialog.language_display_name), mouse_pos.x, mouse_pos.y, 20, BLACK);
         }
 
-        DrawText(TextFormat("T_GEN: %ld, %ld", total_generation_clock_cycles, total_generation_count), 10, GetRenderHeight() - 90, 20, GREEN);
-        DrawText(TextFormat("GEN: %ld", generation_clock_cycles), 10, GetRenderHeight() - 70, 20, GREEN);
-        DrawText(TextFormat("RND: %ld", render_clock_cycles), 10, GetRenderHeight() - 50, 20, GREEN);
+        DrawText(TextFormat("T_GEN: %f, %ld", total_generation_duration, total_generation_count), 10, GetRenderHeight() - 90, 20, GREEN);
+        DrawText(TextFormat("GEN: %f", generation_duration), 10, GetRenderHeight() - 70, 20, GREEN);
+        DrawText(TextFormat("RND: %f", render_duration), 10, GetRenderHeight() - 50, 20, GREEN);
 
         DrawFPS(10, GetRenderHeight() - 25);
 

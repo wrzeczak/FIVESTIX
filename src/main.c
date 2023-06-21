@@ -10,14 +10,13 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <stdio.h>
 #include <stdalign.h>
 
 //! TODO: Move a bunch of implementations of commonly used together variables to the same translation unit for better cache usage
 
 int main(void) {
-    srand(time(NULL));
+    // srand(time(NULL));
 
     InitWindow(WINDOWED_SCREEN_WIDTH, WINDOWED_SCREEN_HEIGHT, "Hello!");
 
@@ -32,14 +31,12 @@ int main(void) {
     // int generation_seed = rand();
     int generation_seed = 0;
 
-    clock_t generation_start_clock = clock();
+    double generation_start = GetTime();
     update_board_terrain(generation_seed, 0.5f);
-    clock_t generation_end_clock = clock();
-
-    clock_t generation_clock_cycles = generation_end_clock - generation_start_clock;
+    double generation_duration = GetTime() - generation_start;
 
     size_t total_generation_count = 1;
-    clock_t total_generation_clock_cycles = generation_clock_cycles;
+    double total_generation_duration = generation_duration;
 
     UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
 
@@ -50,7 +47,7 @@ int main(void) {
 
     temp_init_game();
 
-    clock_t render_clock_cycles = 0;
+    double render_duration = 0.0;
     
     while(!WindowShouldClose()) {
 
@@ -63,11 +60,10 @@ int main(void) {
             map_state %= 3;
 
             generation_seed++;
-            generation_start_clock = clock();
+            generation_start = GetTime();
             update_board_terrain(generation_seed, 0.33f);
-            generation_end_clock = clock();
-            generation_clock_cycles = generation_end_clock - generation_start_clock;
-            total_generation_clock_cycles += generation_clock_cycles;
+            generation_duration = GetTime() - generation_start;
+            total_generation_duration += generation_duration;
             total_generation_count++;
 
             UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
@@ -80,15 +76,13 @@ int main(void) {
 
         //
 
-        // Doesn't work on Windows because clock() is broken, perhaps we just scrap this whole frame-time thing?
-        clock_t render_start_clock = clock();
+        double render_start = GetTime();
         //! WARN: May need to enter texture mode if we add more textures in the future
         //! NOTE: Pretty confident above comment is not an issue
         UpdateTexture(board_map_texture, board.map_pixel_colors_arrays[map_state]);
 
-        render_game(total_generation_clock_cycles, total_generation_count, generation_clock_cycles, render_clock_cycles, pixel_dialog);
+        render_game(total_generation_duration, total_generation_count, generation_duration, render_duration, pixel_dialog);
 
-        clock_t render_end_clock = clock();
-        render_clock_cycles = render_end_clock - render_start_clock;
+        render_duration = GetTime() - render_start;
     }
 }
