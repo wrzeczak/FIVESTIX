@@ -1,137 +1,147 @@
 #version 420 core
 
-const float GRADIENTS_2D[256] = {
-    0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
-    0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
-    0.793353340291235f, -0.60876142900872f, 0.608761429008721f, -0.793353340291235f, 0.38268343236509f, -0.923879532511287f, 0.130526192220052f, -0.99144486137381f,
-    -0.130526192220052f, -0.99144486137381f, -0.38268343236509f, -0.923879532511287f, -0.608761429008721f, -0.793353340291235f, -0.793353340291235f, -0.608761429008721f,
-    -0.923879532511287f, -0.38268343236509f, -0.99144486137381f, -0.130526192220052f, -0.99144486137381f, 0.130526192220051f, -0.923879532511287f, 0.38268343236509f,
-    -0.793353340291235f, 0.608761429008721f, -0.608761429008721f, 0.793353340291235f, -0.38268343236509f, 0.923879532511287f, -0.130526192220052f, 0.99144486137381f,
-    0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
-    0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
-    0.793353340291235f, -0.60876142900872f, 0.608761429008721f, -0.793353340291235f, 0.38268343236509f, -0.923879532511287f, 0.130526192220052f, -0.99144486137381f,
-    -0.130526192220052f, -0.99144486137381f, -0.38268343236509f, -0.923879532511287f, -0.608761429008721f, -0.793353340291235f, -0.793353340291235f, -0.608761429008721f,
-    -0.923879532511287f, -0.38268343236509f, -0.99144486137381f, -0.130526192220052f, -0.99144486137381f, 0.130526192220051f, -0.923879532511287f, 0.38268343236509f,
-    -0.793353340291235f, 0.608761429008721f, -0.608761429008721f, 0.793353340291235f, -0.38268343236509f, 0.923879532511287f, -0.130526192220052f, 0.99144486137381f,
-    0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
-    0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
-    0.793353340291235f, -0.60876142900872f, 0.608761429008721f, -0.793353340291235f, 0.38268343236509f, -0.923879532511287f, 0.130526192220052f, -0.99144486137381f,
-    -0.130526192220052f, -0.99144486137381f, -0.38268343236509f, -0.923879532511287f, -0.608761429008721f, -0.793353340291235f, -0.793353340291235f, -0.608761429008721f,
-    -0.923879532511287f, -0.38268343236509f, -0.99144486137381f, -0.130526192220052f, -0.99144486137381f, 0.130526192220051f, -0.923879532511287f, 0.38268343236509f,
-    -0.793353340291235f, 0.608761429008721f, -0.608761429008721f, 0.793353340291235f, -0.38268343236509f, 0.923879532511287f, -0.130526192220052f, 0.99144486137381f,
-    0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
-    0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
-    0.793353340291235f, -0.60876142900872f, 0.608761429008721f, -0.793353340291235f, 0.38268343236509f, -0.923879532511287f, 0.130526192220052f, -0.99144486137381f,
-    -0.130526192220052f, -0.99144486137381f, -0.38268343236509f, -0.923879532511287f, -0.608761429008721f, -0.793353340291235f, -0.793353340291235f, -0.608761429008721f,
-    -0.923879532511287f, -0.38268343236509f, -0.99144486137381f, -0.130526192220052f, -0.99144486137381f, 0.130526192220051f, -0.923879532511287f, 0.38268343236509f,
-    -0.793353340291235f, 0.608761429008721f, -0.608761429008721f, 0.793353340291235f, -0.38268343236509f, 0.923879532511287f, -0.130526192220052f, 0.99144486137381f,
-    0.130526192220052f, 0.99144486137381f, 0.38268343236509f, 0.923879532511287f, 0.608761429008721f, 0.793353340291235f, 0.793353340291235f, 0.608761429008721f,
-    0.923879532511287f, 0.38268343236509f, 0.99144486137381f, 0.130526192220051f, 0.99144486137381f, -0.130526192220051f, 0.923879532511287f, -0.38268343236509f,
-    0.793353340291235f, -0.60876142900872f, 0.608761429008721f, -0.793353340291235f, 0.38268343236509f, -0.923879532511287f, 0.130526192220052f, -0.99144486137381f,
-    -0.130526192220052f, -0.99144486137381f, -0.38268343236509f, -0.923879532511287f, -0.608761429008721f, -0.793353340291235f, -0.793353340291235f, -0.608761429008721f,
-    -0.923879532511287f, -0.38268343236509f, -0.99144486137381f, -0.130526192220052f, -0.99144486137381f, 0.130526192220051f, -0.923879532511287f, 0.38268343236509f,
-    -0.793353340291235f, 0.608761429008721f, -0.608761429008721f, 0.793353340291235f, -0.38268343236509f, 0.923879532511287f, -0.130526192220052f, 0.99144486137381f,
-    0.38268343236509f, 0.923879532511287f, 0.923879532511287f, 0.38268343236509f, 0.923879532511287f, -0.38268343236509f, 0.38268343236509f, -0.923879532511287f,
-    -0.38268343236509f, -0.923879532511287f, -0.923879532511287f, -0.38268343236509f, -0.923879532511287f, 0.38268343236509f, -0.38268343236509f, 0.923879532511287f,
-};
-
-const int PRIME_X = 501125321;
-const int PRIME_Y = 1136930381;
-const int PRIME_Z = 1720413743;
-
 in vec2 fragTexCoord;
-
-int state_seed = 0;
-
-// cue the magic numbers - discovered while messing around with the fnl GUI
-float state_frequency = 2.0f;
-int state_octaves = 6;
-float state_gain = 0.40f;
-float state_weighted_strength = -0.70f;
-float state_lacunarity = 2.0f;
-
 layout (location = 0) out vec4 color;
 
-float _fnlCalculateFractalBounding() {
-    float gain = abs(state_gain);
-    float amp = gain;
-    float ampFractal = 1.0f;
-    for (int i = 1; i < state_octaves; i++)
+// Most of this shader code is from https://www.shadertoy.com/view/7lBfDz, with changes to suit our environment
+
+//http://flafla2.github.io/2014/08/09/perlinnoise.html
+//https://web.archive.org/web/20160530124230
+//http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
+//http://eastfarthing.com/blog/2015-04-21-noise/
+//https://www.youtube.com/watch?v=Or19ilef4wE
+//https://www.youtube.com/watch?v=MJ3bvCkHJtE
+
+
+//hash from iq
+//https://www.shadertoy.com/view/Xs23D3
+vec2 hash( vec2 p ) 
+{  						
+	p = vec2(dot(p,vec2(127.1,311.7)),
+			 dot(p,vec2(269.5,183.3)));
+    
+	return -1.0 + 2.0 * fract(sin(p + 20.0) * 53758.5453123);
+}
+
+float perlin_noise_2(in vec2 p)
+{
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+    
+    //grid points
+    vec2 p0 = vec2(0.0, 0.0);
+    vec2 p1 = vec2(1.0, 0.0);
+    vec2 p2 = vec2(0.0, 1.0);
+    vec2 p3 = vec2(1.0, 1.0);
+    
+    //distance vectors to each grid point
+    vec2 s0 = f - p0;
+    vec2 s1 = f - p1;
+    vec2 s2 = f - p2;
+    vec2 s3 = f - p3;
+    
+    //random gradient vectors on each grid point
+    vec2 g0 = hash(i + p0);
+    vec2 g1 = hash(i + p1);
+    vec2 g2 = hash(i + p2);
+    vec2 g3 = hash(i + p3);
+    
+    //gradient values
+    float q0 = dot(s0, g0);
+    float q1 = dot(s1, g1);
+    float q2 = dot(s2, g2);
+    float q3 = dot(s3, g3);
+    
+    //interpolant weights
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    
+    //bilinear interpolation
+    float l0 = mix(q0, q1, u.x);
+    float l1 = mix(q2, q3, u.x);
+    float l2 = mix(l0, l1, u.y);
+    
+    return l2;
+}
+
+float perlin_fbm(vec2 uv, float persistence, int octaves) 
+{
+    float total = 0.0;
+    float maxValue = 0.0;
+    float amplitude = 1.0;
+    float frequency = 1.0;
+    
+    for(int i=0; i<octaves;++i)
     {
-        ampFractal += amp;
-        amp *= gain;
+        total += perlin_noise_2(uv * frequency) * amplitude;
+        maxValue += amplitude;
+        amplitude *= persistence;
+        frequency *= 2.0;
     }
-    return 1.0f / ampFractal;
+    
+    return total/maxValue;
 }
 
-float _fnlInterpQuintic(float t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+vec4 render(vec2 uv)
+{
+    // main height
+    float h0 = 0.5 + perlin_fbm(0.1 * uv, 0.3, 8);
+    // continentalness
+    float c = 0.5 + perlin_fbm(0.1 * uv + vec2(314.123, 1231.0), 0.6, 8);
+    // erossion
+    float e = 0.5 + perlin_fbm(0.1 * uv + vec2(100.0, 100.0), 0.6, 9);
+    // riverness
+    float r = 0.5 + perlin_fbm(0.1 * uv + vec2(-100.0, 200.0), 0.4, 3);
+    // river (when close to middle)
+    float r2 = 0.5 + perlin_fbm(0.5 * uv + vec2(-300.0, 200.0), 0.6, 4);
 
-int _fnlHash2D(int seed, int xPrimed, int yPrimed) {
-    int hash = seed ^ xPrimed ^ yPrimed;
+    // temperature
+    // humidity, verying very slowly
+    float hum = 0.5 + perlin_fbm(0.02 * uv + vec2(420.0, 200.0), 0.6, 7);
+    // weirdness
 
-    hash *= 0x27d4eb2d;
-    return hash;
-}
+    // return vec4(n1 + 0.5, n1 + 0.5, 0.0, 0.0);
+    //return vec4(n2 + 0.5, n2 + 0.5, 0.0, 0.0);
 
-float _fnlGradCoord2D(int seed, int xPrimed, int yPrimed, float xd, float yd) {
-    int hash = _fnlHash2D(seed, xPrimed, yPrimed);
-    hash ^= hash >> 15;
-    hash &= 127 << 1;
-    return xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash | 1];
-}
+    float h = e * c;
+    //float h = h0;
 
-float _fnlSinglePerlin2D(int seed, float x, float y) {
-    int x0 = int(floor(x));
-    int y0 = int(floor(y));
+    float sea_base = 0.18;
 
-    float xd0 = float(x - x0);
-    float yd0 = float(y - y0);
-    float xd1 = xd0 - 1;
-    float yd1 = yd0 - 1;
+    float sea_color = 0.4;  // shade of blue
 
-    float xs = _fnlInterpQuintic(xd0);
-    float ys = _fnlInterpQuintic(yd0);
-
-    x0 *= PRIME_X;
-    y0 *= PRIME_Y;
-    int x1 = x0 + PRIME_X;
-    int y1 = y0 + PRIME_Y;
-
-    float xf0 = mix(_fnlGradCoord2D(seed, x0, y0, xd0, yd0), _fnlGradCoord2D(seed, x1, y0, xd1, yd0), xs);
-    float xf1 = mix(_fnlGradCoord2D(seed, x0, y1, xd0, yd1), _fnlGradCoord2D(seed, x1, y1, xd1, yd1), xs);
-
-    return mix(xf0, xf1, ys) * 1.4247691104677813f;
-}
-
-float _fnlGenFractalFBM2D(float x, float y) {
-    int seed = state_seed;
-    float sum = 0;
-    float amp = _fnlCalculateFractalBounding();
-
-    for (int i = 0; i < state_octaves; i++) {
-        float noise = _fnlSinglePerlin2D(seed++, x, y);
-        sum += noise * amp;
-        amp *= mix(1.0f, min(noise + 1, 2) * 0.5f, state_weighted_strength);
-
-        x *= state_lacunarity;
-        y *= state_lacunarity;
-        amp *= state_gain;
+    if (h < sea_base) {
+        if (h < sea_base - 0.02) {
+            // deep water
+            return vec4(0.0, 0.0, sea_color, 1.0);
+        } else {
+            // sea close to shore
+            return vec4(0.0, 0.08, sea_color, 1.0);
+        }
+    } else {
+        // 0 - fully connected rivers
+        // 0.45 some dead ends (more open land area with no rivers)
+        // 1.0 - no rivers
+        float close_to_sea = (h - sea_base)/(1.0 - sea_base);  // 0 at sea, 1 at max
+        float close_to_sea2 = 1.0 - pow(1.0 - close_to_sea, 32.0);
+        // When close to sea, makes river more likely, thus likely to be wider.
+        if (r >= 0.48) {
+            // close_to_sea2 can get very close to 1.0, which will make super thin rivers
+            // mutliply by 0.99 to set minimum river width
+            if (0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
+            //if (0.49 <= r2 && r2 <= 0.51) {
+                // Vary color of rivers a bit related to height / closness to sea
+                return vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
+            }
+        } else {
+            // land
+        }
     }
 
-    return sum;
+    // Color land more grean in humid areas
+    return vec4(h * (1.0 - hum), h * hum, h * (1.0 - hum), 1.0);
 }
 
-void main() {
-    float x = fragTexCoord.x;
-    float y = fragTexCoord.y;
-
-    x *= state_frequency;
-    y *= state_frequency;
-
-    float height = _fnlGenFractalFBM2D(x, y);
-
-    height += 1;
-    height /= 2.0f;
-
-    color = vec4(vec3(height), 1);
+void main()
+{
+   	color = render(fragTexCoord*10.0f);
 }
