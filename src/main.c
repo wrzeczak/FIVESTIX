@@ -27,21 +27,19 @@ int main(void) {
 
     size_t map_state = MS_COUNTRY;
 
+    init_camera();
+    init_board();
+
     // Don't do this until we actually want random terrain
     // int generation_seed = rand();
     int generation_seed = 0;
 
     double generation_start = GetTime();
-    update_board_terrain(generation_seed, 0.5f);
+    update_board_terrain(generation_seed);
     double generation_duration = GetTime() - generation_start;
 
     size_t total_generation_count = 1;
     double total_generation_duration = generation_duration;
-
-    UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
-
-    init_camera();
-    init_board();
 
     // At the moment the order of initialization before here for everything is irrelevant
 
@@ -61,12 +59,10 @@ int main(void) {
 
             generation_seed++;
             generation_start = GetTime();
-            update_board_terrain(generation_seed, 0.33f);
+            update_board_terrain(generation_seed);
             generation_duration = GetTime() - generation_start;
             total_generation_duration += generation_duration;
             total_generation_count++;
-
-            UpdateTexture(board_terrain_texture, board.terrain_pixel_colors);
         }
 
         update_camera();

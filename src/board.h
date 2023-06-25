@@ -26,8 +26,6 @@ typedef struct {
     // One array of colors for each map state
     _Alignas(64) Color map_pixel_colors_arrays[BOARD_MAP_STATES_COUNT][BOARD_PIXEL_COUNT];
 
-    _Alignas(64) Color terrain_pixel_colors[BOARD_PIXEL_COUNT];
-
     // Pixel id information, maybe split into seperate arrays in the future if needed
     _Alignas(64) BoardPixelId ids[BOARD_PIXEL_COUNT];
 } Board;
@@ -36,7 +34,7 @@ typedef struct {
 extern Board board;
 
 void init_board(void);
-void update_board_terrain(int seed, float ocean_threshold);
+void update_board_terrain(int seed);
 // This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
 void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id);
 

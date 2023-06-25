@@ -14,10 +14,10 @@
 
 #define BOARD_MAP_STATES_COUNT 3
 
-#define NULL_UCHAR (unsigned char)-1
-#define NULL_USHORT (unsigned short)-1
-#define NULL_UINT (unsigned int)-1
-#define NULL_ULONG (unsigned long)-1
+#define NULL_UCHAR ((uchar)-1)
+#define NULL_USHORT ((ushort)-1)
+#define NULL_UINT ((uint)-1)
+#define NULL_ULONG ((ulong)-1)
 
 #define WINDOWED_SCREEN_WIDTH 1280
 #define WINDOWED_SCREEN_HEIGHT 720
