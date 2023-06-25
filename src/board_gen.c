@@ -11,7 +11,7 @@ static uint framebuffer;
 
 //! TODO: Find a proper solution for this
 // Ugly hack, rlgl uses a heap allocated buffer on its rlReadTexturePixels function and we want to read into a predetermined buffer, hence this is necessary
-void glGetTexImage(uint target, int level, uint format, uint type, void* pixels);
+void glGetTexImage(uint target, int level, uint format, uint type, void * pixels);
 #define GL_TEXTURE_2D 0x0DE1
 //
 
