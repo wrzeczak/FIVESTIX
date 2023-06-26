@@ -3,32 +3,37 @@
 #include "types.h"
 #include "render.h"
 #include "raylib.h"
+#include "pixel_attrib.h"
+#include "board.h"
+#include "ext.h"
 #include "rlgl.h"
+#include "raymath.h"
 #include <stddef.h>
 
 _Alignas(64) static Shader shader;
-static uint framebuffer;
-
-//! TODO: Find a proper solution for this
-// Ugly hack, rlgl uses a heap allocated buffer on its rlReadTexturePixels function and we want to read into a predetermined buffer, hence this is necessary
-void glGetTexImage(uint target, int level, uint format, uint type, void * pixels);
-#define GL_TEXTURE_2D 0x0DE1
-//
+static uint framebuffer_id;
 
 void init_board_gen(void) {
-    shader = LoadShader(0, "resources/board_gen_fragment.glsl");
+    shader = LoadShader(NULL, "resources/board_gen_fragment.glsl");
     
     // Params are unused here for some reason
-    framebuffer = rlLoadFramebuffer(BOARD_SIZE, BOARD_SIZE);
+    framebuffer_id = rlLoadFramebuffer(BOARD_SIZE, BOARD_SIZE);
 
-    rlFramebufferAttach(framebuffer, board_terrain_texture.id, RL_ATTACHMENT_COLOR_CHANNEL0, RL_ATTACHMENT_TEXTURE2D, 0);
+    rlFramebufferAttach(framebuffer_id, board_terrain_texture.id, RL_ATTACHMENT_COLOR_CHANNEL0, RL_ATTACHMENT_TEXTURE2D, 0);
+    rlFramebufferAttach(framebuffer_id, board_country_map_texture.id, RL_ATTACHMENT_COLOR_CHANNEL1, RL_ATTACHMENT_TEXTURE2D, 0);
 }
 
 void generate_board(void) {
+    SetShaderValueV(shader, GetShaderLocation(shader, "country_colors"), country_colors, SHADER_UNIFORM_VEC4, MAX_COUNTRIES_COUNT);
+
+    // This needs to be done for some reason, otherwise other color channels will not output
+    rlEnableFramebuffer(framebuffer_id);
+
+    rlActiveDrawBuffers(2);
     rlDisableColorBlend();
     BeginTextureMode((RenderTexture2D) { .texture = { .width = BOARD_SIZE, .height = BOARD_SIZE } });
     BeginShaderMode(shader);
-    rlEnableFramebuffer(framebuffer);
+    rlEnableFramebuffer(framebuffer_id);
     rlBegin(RL_QUADS);
 
     rlColor4ub(255, 255, 255, 255);
@@ -55,4 +60,7 @@ void generate_board(void) {
     EndTextureMode();
     rlDisableFramebuffer();
     rlEnableColorBlend();
+    rlActiveDrawBuffers(1);
+
+    // read_texture_pixels(board_country_map_texture.id, BOARD_SIZE, BOARD_SIZE, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, board.map_pixel_colors_arrays[MS_COUNTRY]);
 }

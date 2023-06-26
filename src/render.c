@@ -5,15 +5,15 @@
 #include <stdalign.h>
 
 //! TODO: Like in camera.c we can use better types possibly
-_Alignas(64) Texture2D board_map_texture;
-Texture2D board_terrain_texture;
+_Alignas(64) Texture2D board_terrain_texture;
+Texture2D board_country_map_texture;
 
 void init_render(void) {
-    board_map_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
     board_terrain_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
+    board_country_map_texture = init_texture_with_size(BOARD_SIZE, BOARD_SIZE);
 
-    SetTextureFilter(board_map_texture, TEXTURE_FILTER_POINT);
     SetTextureFilter(board_terrain_texture, TEXTURE_FILTER_POINT);
+    SetTextureFilter(board_country_map_texture, TEXTURE_FILTER_POINT);
 }
 
 void render_game(double total_generation_duration, size_t total_generation_count, double generation_duration, double render_duration, PixelDialog pixel_dialog) {
@@ -22,7 +22,7 @@ void render_game(double total_generation_duration, size_t total_generation_count
         BeginMode2D(camera);
             ClearBackground(BLACK);
 
-            DrawTexturePro(board_map_texture, (Rectangle) { 0.0f, 0.0f, board_map_texture.width, board_map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+            DrawTexturePro(board_country_map_texture, (Rectangle) { 0.0f, 0.0f, board_country_map_texture.width, board_country_map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
             DrawTextureEx(board_terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
             
         EndMode2D();

@@ -35,7 +35,5 @@ extern Board board;
 
 void init_board(void);
 void update_board_terrain(int seed);
-// This function is mainly for testing/debugging, actual changes to pixel states should be more graceful
-void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id);
 
 #define GET_BOARD_INDEX(X, Y) (((Y) * BOARD_SIZE) + (X))

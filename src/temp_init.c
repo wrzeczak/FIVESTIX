@@ -3,17 +3,5 @@
 #include "board.h"
 
 void temp_init_game(void) {
-    country_display_names[0] = "TestCountry";
-    culture_display_names[0] = "TestCulture";
-    language_display_names[0] = "TestLanguage";
-
-    set_board_map_pixel_state(GET_BOARD_INDEX(0, 0), RED, Fade(RED, 0.5f), Fade(RED, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
-    set_board_map_pixel_state(GET_BOARD_INDEX(10, 10), ORANGE, Fade(ORANGE, 0.5f), Fade(ORANGE, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
-    set_board_map_pixel_state(GET_BOARD_INDEX(10, 5), YELLOW, Fade(YELLOW, 0.5f), Fade(YELLOW, 0.25f), (BoardPixelId) {
-        0, 0, 0
-    });
+    
 }

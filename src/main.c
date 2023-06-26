@@ -73,9 +73,6 @@ int main(void) {
         //
 
         double render_start = GetTime();
-        //! WARN: May need to enter texture mode if we add more textures in the future
-        //! NOTE: Pretty confident above comment is not an issue
-        UpdateTexture(board_map_texture, board.map_pixel_colors_arrays[map_state]);
 
         render_game(total_generation_duration, total_generation_count, generation_duration, render_duration, pixel_dialog);
 

@@ -1,6 +1,7 @@
 #include "board.h"
 #include "raymath.h"
 #include "board_gen.h"
+#include "pixel_attrib.h"
 #include <stdalign.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,23 +18,21 @@ void init_board(void) {
         };
     }
 
-    for(size_t i = 0; i < BOARD_MAP_STATES_COUNT; i++) {
-        Color * pixel_colors = board.map_pixel_colors_arrays[i];
-        for(size_t j = 0; j < BOARD_PIXEL_COUNT; j++) {
-            pixel_colors[j] = WHITE;
-        }
-    }
-
     init_board_gen();
 }
 
-void update_board_terrain(int seed) {
-    generate_board();
+static ubyte get_random_byte() {
+    return rand() % 256;
 }
 
-void set_board_map_pixel_state(size_t index, Color country_color, Color culture_color, Color language_color, BoardPixelId id) {
-    board.map_pixel_colors_arrays[MS_COUNTRY][index] = country_color;
-    board.map_pixel_colors_arrays[MS_CULTURE][index] = culture_color;
-    board.map_pixel_colors_arrays[MS_LANGUAGE][index] = language_color;
-    board.ids[index] = id;
+void update_board_terrain(int seed) {
+    srand(seed);
+
+    for (size_t i = 0; i < MAX_COUNTRIES_COUNT; i++) {
+        //! TODO: Add proper naming
+        country_display_names[i] = "Test";
+        country_colors[i] = (Vector4) { get_random_byte() / 255.0f, get_random_byte() / 255.0f, get_random_byte() / 255.0f, 1.0f };
+    }
+
+    generate_board();
 }

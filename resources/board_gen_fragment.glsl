@@ -1,7 +1,11 @@
 #version 420 core
 
+//! TODO: Use a texture sampler here instead? May be faster
+uniform vec4 country_colors[];
+
 in vec2 fragTexCoord;
-layout (location = 0) out vec4 color;
+layout (location = 0) out vec4 terrain_color;
+layout (location = 1) out vec4 country_color;
 
 // Most of this shader code is from https://www.shadertoy.com/view/7lBfDz, with changes to suit our environment
 
@@ -16,7 +20,7 @@ layout (location = 0) out vec4 color;
 //hash from iq
 //https://www.shadertoy.com/view/Xs23D3
 vec2 hash(vec2 p) {  						
-	p = vec2(dot(p,vec2(127.1, 311.7)), dot(p,vec2(269.5, 183.3)));
+	p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
     
 	return -1.0 + 2.0 * fract(sin(p + 20.0) * 53758.5453123);
 }
@@ -76,7 +80,7 @@ float perlin_fbm(vec2 tex_coord, float persistence, int octaves) {
     return total/max_value;
 }
 
-vec4 get_terrain_color(vec2 tex_coord) {
+void set_terrain(vec2 tex_coord) {
     // main height
     float h0 = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
     // continentalness
@@ -106,10 +110,12 @@ vec4 get_terrain_color(vec2 tex_coord) {
     if(h < sea_base) {
         if(h < sea_base - 0.02) {
             // deep water
-            return vec4(0.0, 0.0, sea_color, 1.0);
+            terrain_color = vec4(0.0, 0.0, sea_color, 1.0);
+            return;
         } else {
             // sea close to shore
-            return vec4(0.0, 0.08, sea_color, 1.0);
+            terrain_color = vec4(0.0, 0.08, sea_color, 1.0);
+            return;
         }
     } else {
         // 0 - fully connected rivers
@@ -124,7 +130,8 @@ vec4 get_terrain_color(vec2 tex_coord) {
             if(0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
             //if(0.49 <= r2 && r2 <= 0.51) {
                 // Vary color of rivers a bit related to height / closness to sea
-                return vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
+                terrain_color = vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
+                return;
             }
         } else {
             // land
@@ -132,9 +139,20 @@ vec4 get_terrain_color(vec2 tex_coord) {
     }
 
     // Color land more grean in humid areas
-    return vec4(h * (1.0 - hum), h * hum, h * (1.0 - hum), 1.0);
+    terrain_color = vec4(h * (1.0 - hum), h * hum, h * (1.0 - hum), 1.0);
+    return;
+}
+
+void set_country(vec2 tex_coord) {
+    float test_country_val = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
+    if (test_country_val > 0.5) {
+        country_color = country_colors[0];
+    } else {
+        country_color = country_colors[1];
+    }
 }
 
 void main() {
-    color = get_terrain_color(fragTexCoord*10.0f);
+    set_terrain(fragTexCoord*10.0f);
+    set_country(fragTexCoord*10.0f);
 }
