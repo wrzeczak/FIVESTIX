@@ -15,16 +15,13 @@ layout (location = 0) out vec4 color;
 
 //hash from iq
 //https://www.shadertoy.com/view/Xs23D3
-vec2 hash( vec2 p ) 
-{  						
-	p = vec2(dot(p,vec2(127.1,311.7)),
-			 dot(p,vec2(269.5,183.3)));
+vec2 hash(vec2 p) {  						
+	p = vec2(dot(p,vec2(127.1, 311.7)), dot(p,vec2(269.5, 183.3)));
     
 	return -1.0 + 2.0 * fract(sin(p + 20.0) * 53758.5453123);
 }
 
-float perlin_noise_2(in vec2 p)
-{
+float perlin_noise_2(vec2 p) {
 	vec2 i = floor(p);
 	vec2 f = fract(p);
     
@@ -63,40 +60,37 @@ float perlin_noise_2(in vec2 p)
     return l2;
 }
 
-float perlin_fbm(vec2 uv, float persistence, int octaves) 
-{
+float perlin_fbm(vec2 tex_coord, float persistence, int octaves) {
     float total = 0.0;
-    float maxValue = 0.0;
+    float max_value = 0.0;
     float amplitude = 1.0;
     float frequency = 1.0;
     
-    for(int i=0; i<octaves;++i)
-    {
-        total += perlin_noise_2(uv * frequency) * amplitude;
-        maxValue += amplitude;
+    for(int i = 0; i < octaves; ++i) {
+        total += perlin_noise_2(tex_coord * frequency) * amplitude;
+        max_value += amplitude;
         amplitude *= persistence;
         frequency *= 2.0;
     }
     
-    return total/maxValue;
+    return total/max_value;
 }
 
-vec4 render(vec2 uv)
-{
+vec4 get_terrain_color(vec2 tex_coord) {
     // main height
-    float h0 = 0.5 + perlin_fbm(0.1 * uv, 0.3, 8);
+    float h0 = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
     // continentalness
-    float c = 0.5 + perlin_fbm(0.1 * uv + vec2(314.123, 1231.0), 0.6, 8);
+    float c = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(314.123, 1231.0), 0.6, 8);
     // erossion
-    float e = 0.5 + perlin_fbm(0.1 * uv + vec2(100.0, 100.0), 0.6, 9);
+    float e = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(100.0, 100.0), 0.6, 9);
     // riverness
-    float r = 0.5 + perlin_fbm(0.1 * uv + vec2(-100.0, 200.0), 0.4, 3);
+    float r = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(-100.0, 200.0), 0.4, 3);
     // river (when close to middle)
-    float r2 = 0.5 + perlin_fbm(0.5 * uv + vec2(-300.0, 200.0), 0.6, 4);
+    float r2 = 0.5 + perlin_fbm(0.5 * tex_coord + vec2(-300.0, 200.0), 0.6, 4);
 
     // temperature
     // humidity, verying very slowly
-    float hum = 0.5 + perlin_fbm(0.02 * uv + vec2(420.0, 200.0), 0.6, 7);
+    float hum = 0.5 + perlin_fbm(0.02 * tex_coord + vec2(420.0, 200.0), 0.6, 7);
     // weirdness
 
     // return vec4(n1 + 0.5, n1 + 0.5, 0.0, 0.0);
@@ -109,8 +103,8 @@ vec4 render(vec2 uv)
 
     float sea_color = 0.4;  // shade of blue
 
-    if (h < sea_base) {
-        if (h < sea_base - 0.02) {
+    if(h < sea_base) {
+        if(h < sea_base - 0.02) {
             // deep water
             return vec4(0.0, 0.0, sea_color, 1.0);
         } else {
@@ -124,11 +118,11 @@ vec4 render(vec2 uv)
         float close_to_sea = (h - sea_base)/(1.0 - sea_base);  // 0 at sea, 1 at max
         float close_to_sea2 = 1.0 - pow(1.0 - close_to_sea, 32.0);
         // When close to sea, makes river more likely, thus likely to be wider.
-        if (r >= 0.48) {
+        if(r >= 0.48) {
             // close_to_sea2 can get very close to 1.0, which will make super thin rivers
             // mutliply by 0.99 to set minimum river width
-            if (0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
-            //if (0.49 <= r2 && r2 <= 0.51) {
+            if(0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
+            //if(0.49 <= r2 && r2 <= 0.51) {
                 // Vary color of rivers a bit related to height / closness to sea
                 return vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
             }
@@ -141,7 +135,6 @@ vec4 render(vec2 uv)
     return vec4(h * (1.0 - hum), h * hum, h * (1.0 - hum), 1.0);
 }
 
-void main()
-{
-   	color = render(fragTexCoord*10.0f);
+void main() {
+    color = get_terrain_color(fragTexCoord*10.0f);
 }
