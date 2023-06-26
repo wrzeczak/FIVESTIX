@@ -15,17 +15,14 @@ typedef enum {
 } BoardMapState;
 
 typedef struct {
-    ushort country_id;
-    ushort culture_id;
-    ushort language_id;
+    uint country_id;
+    uint culture_id;
+    uint language_id;
 } BoardPixelId;
 
 // Using SoA here as to cut down on cacheline usage
 // All data is indexed in row-major order, i.e x then y
 typedef struct {
-    // One array of colors for each map state
-    _Alignas(64) Color map_pixel_colors_arrays[BOARD_MAP_STATES_COUNT][BOARD_PIXEL_COUNT];
-
     // Pixel id information, maybe split into seperate arrays in the future if needed
     _Alignas(64) BoardPixelId ids[BOARD_PIXEL_COUNT];
 } Board;

@@ -6,6 +6,7 @@ uniform vec4 country_colors[];
 in vec2 fragTexCoord;
 layout (location = 0) out vec4 terrain_color;
 layout (location = 1) out vec4 country_color;
+layout (location = 2) out uvec3 board_pixel_id;
 
 // Most of this shader code is from https://www.shadertoy.com/view/7lBfDz, with changes to suit our environment
 
@@ -147,8 +148,10 @@ void set_country(vec2 tex_coord) {
     float test_country_val = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
     if (test_country_val > 0.5) {
         country_color = country_colors[0];
+        board_pixel_id = uvec3(0, -1, -1);
     } else {
         country_color = country_colors[1];
+        board_pixel_id = uvec3(1, -1, -1);
     }
 }
 

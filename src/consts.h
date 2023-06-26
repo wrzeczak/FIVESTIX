@@ -14,7 +14,7 @@
 
 #define BOARD_MAP_STATES_COUNT 3
 
-#define NULL_UCHAR ((uchar)-1)
+#define NULL_UBYTE ((ubyte)-1)
 #define NULL_USHORT ((ushort)-1)
 #define NULL_UINT ((uint)-1)
 #define NULL_ULONG ((ulong)-1)

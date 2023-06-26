@@ -27,8 +27,8 @@ PixelDialog get_pixel_dialog(void) {
 
     //! TODO: Probably should implement bounds checks here so we never read erroneous memory
     return (PixelDialog) {
-        .country_display_name = id.country_id != NULL_USHORT ? country_display_names[id.country_id] : "None",
-        .culture_display_name = id.culture_id != NULL_USHORT ? country_display_names[id.culture_id] : "None",
-        .language_display_name = id.language_id != NULL_USHORT ? country_display_names[id.language_id] : "None"
+        .country_display_name = id.country_id != NULL_UINT ? country_display_names[id.country_id] : "None",
+        .culture_display_name = id.culture_id != NULL_UINT ? culture_display_names[id.culture_id] : "None",
+        .language_display_name = id.language_id != NULL_UINT ? language_display_names[id.language_id] : "None"
     };
 }
