@@ -22,8 +22,10 @@ void render_game(double total_generation_duration, size_t total_generation_count
         BeginMode2D(camera);
             ClearBackground(BLACK);
 
-            DrawTexturePro(board_country_map_texture, (Rectangle) { 0.0f, 0.0f, board_country_map_texture.width, board_country_map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
-            DrawTextureEx(board_terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
+            // DrawTexturePro(board_country_map_texture, (Rectangle) { 0.0f, 0.0f, board_country_map_texture.width, board_country_map_texture.height }, (Rectangle) { 0.0f, 0.0f, BOARD_RECT_SIZE, BOARD_RECT_SIZE }, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+            // DrawTextureEx(board_terrain_texture, (Vector2) { BOARD_SIZE * -1.5f, 0 }, 0.0f, 1.5f, WHITE);
+            DrawTextureEx(board_terrain_texture, (Vector2) { 0, 0 }, 0.0f, 1.5f, WHITE);
+            DrawTextureEx(board_country_map_texture, (Vector2) { BOARD_SIZE * 1.5f, 0 }, 0.0f, 1.5f, WHITE);
             
         EndMode2D();
         

@@ -8,7 +8,7 @@ layout (location = 0) out vec4 terrain_color;
 layout (location = 1) out vec4 country_color;
 layout (location = 2) out uvec3 board_pixel_id;
 
-// Most of this shader code is from https://www.shadertoy.com/view/7lBfDz, with changes to suit our environment
+// Most of this shader code is from https://www.shadertoy.com/view/7lBfDz, with changes to support more advanced generation
 
 //http://flafla2.github.io/2014/08/09/perlinnoise.html
 //https://web.archive.org/web/20160530124230
@@ -16,7 +16,6 @@ layout (location = 2) out uvec3 board_pixel_id;
 //http://eastfarthing.com/blog/2015-04-21-noise/
 //https://www.youtube.com/watch?v=Or19ilef4wE
 //https://www.youtube.com/watch?v=MJ3bvCkHJtE
-
 
 //hash from iq
 //https://www.shadertoy.com/view/Xs23D3
@@ -81,7 +80,7 @@ float perlin_fbm(vec2 tex_coord, float persistence, int octaves) {
     return total/max_value;
 }
 
-void set_terrain(vec2 tex_coord) {
+void render(vec2 tex_coord) {
     // main height
     float h0 = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
     // continentalness
@@ -99,7 +98,7 @@ void set_terrain(vec2 tex_coord) {
     // weirdness
 
     // return vec4(n1 + 0.5, n1 + 0.5, 0.0, 0.0);
-    //return vec4(n2 + 0.5, n2 + 0.5, 0.0, 0.0);
+    // return vec4(n2 + 0.5, n2 + 0.5, 0.0, 0.0);
 
     float h = e * c;
     //float h = h0;
@@ -113,30 +112,24 @@ void set_terrain(vec2 tex_coord) {
             // deep water
             terrain_color = vec4(0.0, 0.0, sea_color, 1.0);
             return;
-        } else {
-            // sea close to shore
-            terrain_color = vec4(0.0, 0.08, sea_color, 1.0);
-            return;
         }
-    } else {
-        // 0 - fully connected rivers
-        // 0.45 some dead ends (more open land area with no rivers)
-        // 1.0 - no rivers
-        float close_to_sea = (h - sea_base)/(1.0 - sea_base);  // 0 at sea, 1 at max
-        float close_to_sea2 = 1.0 - pow(1.0 - close_to_sea, 32.0);
-        // When close to sea, makes river more likely, thus likely to be wider.
-        if(r >= 0.48) {
-            // close_to_sea2 can get very close to 1.0, which will make super thin rivers
-            // mutliply by 0.99 to set minimum river width
-            if(0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
-            //if(0.49 <= r2 && r2 <= 0.51) {
-                // Vary color of rivers a bit related to height / closness to sea
-                terrain_color = vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
-                return;
-            }
-        } else {
-            // land
-        }
+        // sea close to shore
+        terrain_color = vec4(0.0, 0.08, sea_color, 1.0);
+        return;
+    }
+
+    // 0 - fully connected rivers
+    // 0.45 some dead ends (more open land area with no rivers)
+    // 1.0 - no rivers
+    float close_to_sea = (h - sea_base)/(1.0 - sea_base);  // 0 at sea, 1 at max
+    float close_to_sea2 = 1.0 - pow(1.0 - close_to_sea, 32.0);
+    // When close to sea, makes river more likely, thus likely to be wider.
+    if(r >= 0.48 && 0.5 * 0.99 * close_to_sea2 <= r2 && r2 <= 1.0 - 0.99 * close_to_sea2 * 0.5) {
+        // close_to_sea2 can get very close to 1.0, which will make super thin rivers
+        // mutliply by 0.99 to set minimum river width
+        // Vary color of rivers a bit related to height / closness to sea
+        terrain_color = vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
+        return;
     }
 
     // Color land more grean in humid areas
@@ -144,18 +137,6 @@ void set_terrain(vec2 tex_coord) {
     return;
 }
 
-void set_country(vec2 tex_coord) {
-    float test_country_val = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
-    if (test_country_val > 0.5) {
-        country_color = country_colors[0];
-        board_pixel_id = uvec3(0, -1, -1);
-    } else {
-        country_color = country_colors[1];
-        board_pixel_id = uvec3(1, -1, -1);
-    }
-}
-
 void main() {
-    set_terrain(fragTexCoord*10.0f);
-    set_country(fragTexCoord*10.0f);
+    render(fragTexCoord*10.0f);
 }

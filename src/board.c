@@ -12,7 +12,7 @@ void init_board(void) {
     init_board_gen();
 }
 
-static ubyte get_random_byte() {
+static ubyte get_random_byte(void) {
     return rand() % 256;
 }
 

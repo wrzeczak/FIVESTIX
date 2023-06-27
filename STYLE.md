@@ -5,7 +5,7 @@
 For all multi-line declarations (structs, functions, etc.) do not do the Linus thing, instead do:
 
 ```c
-void func() {
+void func(void) {
     ...
 }
 
