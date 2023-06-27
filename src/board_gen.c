@@ -28,8 +28,9 @@ void init_board_gen(void) {
     rlFramebufferAttach(framebuffer_id, board_pixel_id_texture_id, RL_ATTACHMENT_COLOR_CHANNEL2, RL_ATTACHMENT_TEXTURE2D, 0);
 }
 
-void generate_board(void) {
+void generate_board(float seed) {
     SetShaderValueV(shader, GetShaderLocation(shader, "country_colors"), country_colors, SHADER_UNIFORM_VEC4, MAX_COUNTRIES_COUNT);
+    SetShaderValue(shader, GetShaderLocation(shader, "gen_seed"), &seed, SHADER_UNIFORM_FLOAT);
 
     // This needs to be done for some reason, otherwise other color channels will not output
     rlEnableFramebuffer(framebuffer_id);

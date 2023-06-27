@@ -1,7 +1,9 @@
 #version 420 core
 
 //! TODO: Use a texture sampler here instead? May be faster
-uniform vec4 country_colors[];
+uniform vec4 country_colors[8];
+//! TODO: Use UBO
+uniform float gen_seed;
 
 in vec2 fragTexCoord;
 layout (location = 0) out vec4 terrain_color;
@@ -19,13 +21,13 @@ layout (location = 2) out uvec3 board_pixel_id;
 
 //hash from iq
 //https://www.shadertoy.com/view/Xs23D3
-vec2 hash(vec2 p) {  						
+vec2 hash(vec2 p, float seed) {  						
 	p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
     
-	return -1.0 + 2.0 * fract(sin(p + 20.0) * 53758.5453123);
+	return -1.0 + 2.0 * fract(sin(p + 20.0) * (53758.5453123 + seed));
 }
 
-float perlin_noise_2(vec2 p) {
+float perlin_noise_2(vec2 p, float seed) {
 	vec2 i = floor(p);
 	vec2 f = fract(p);
     
@@ -42,10 +44,10 @@ float perlin_noise_2(vec2 p) {
     vec2 s3 = f - p3;
     
     //random gradient vectors on each grid point
-    vec2 g0 = hash(i + p0);
-    vec2 g1 = hash(i + p1);
-    vec2 g2 = hash(i + p2);
-    vec2 g3 = hash(i + p3);
+    vec2 g0 = hash(i + p0, seed);
+    vec2 g1 = hash(i + p1, seed);
+    vec2 g2 = hash(i + p2, seed);
+    vec2 g3 = hash(i + p3, seed);
     
     //gradient values
     float q0 = dot(s0, g0);
@@ -64,44 +66,44 @@ float perlin_noise_2(vec2 p) {
     return l2;
 }
 
-float perlin_fbm(vec2 tex_coord, float persistence, int octaves) {
+float perlin_fbm(vec2 tex_coord, float persistence, int octaves, float seed) {
     float total = 0.0;
     float max_value = 0.0;
     float amplitude = 1.0;
     float frequency = 1.0;
     
     for(int i = 0; i < octaves; ++i) {
-        total += perlin_noise_2(tex_coord * frequency) * amplitude;
+        total += perlin_noise_2(tex_coord * frequency, seed) * amplitude;
         max_value += amplitude;
         amplitude *= persistence;
         frequency *= 2.0;
+        ++seed;
     }
     
     return total/max_value;
 }
 
-void render(vec2 tex_coord) {
+void render(vec2 tex_coord, float seed) {
     // main height
-    float h0 = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8);
+    float h0 = 0.5 + perlin_fbm(0.1 * tex_coord, 0.3, 8, seed);
     // continentalness
-    float c = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(314.123, 1231.0), 0.6, 8);
+    float c = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(314.123, 1231.0), 0.6, 8, seed);
     // erossion
-    float e = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(100.0, 100.0), 0.6, 9);
+    float e = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(100.0, 100.0), 0.6, 9, seed);
     // riverness
-    float r = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(-100.0, 200.0), 0.4, 3);
+    float r = 0.5 + perlin_fbm(0.1 * tex_coord + vec2(-100.0, 200.0), 0.4, 3, seed);
     // river (when close to middle)
-    float r2 = 0.5 + perlin_fbm(0.5 * tex_coord + vec2(-300.0, 200.0), 0.6, 4);
+    float r2 = 0.5 + perlin_fbm(0.5 * tex_coord + vec2(-300.0, 200.0), 0.6, 4, seed);
 
     // temperature
     // humidity, verying very slowly
-    float hum = 0.5 + perlin_fbm(0.02 * tex_coord + vec2(420.0, 200.0), 0.6, 7);
+    float hum = 0.5 + perlin_fbm(0.02 * tex_coord + vec2(420.0, 200.0), 0.6, 7, seed);
     // weirdness
 
     // return vec4(n1 + 0.5, n1 + 0.5, 0.0, 0.0);
     // return vec4(n2 + 0.5, n2 + 0.5, 0.0, 0.0);
 
     float h = e * c;
-    //float h = h0;
 
     float sea_base = 0.18;
 
@@ -111,10 +113,14 @@ void render(vec2 tex_coord) {
         if(h < sea_base - 0.02) {
             // deep water
             terrain_color = vec4(0.0, 0.0, sea_color, 1.0);
+            country_color = vec4(0);
+            board_pixel_id = uvec3(-1, -1, -1);
             return;
         }
         // sea close to shore
         terrain_color = vec4(0.0, 0.08, sea_color, 1.0);
+        country_color = vec4(0);
+        board_pixel_id = uvec3(-1, -1, -1);
         return;
     }
 
@@ -129,8 +135,23 @@ void render(vec2 tex_coord) {
         // mutliply by 0.99 to set minimum river width
         // Vary color of rivers a bit related to height / closness to sea
         terrain_color = vec4(0.0, close_to_sea * 0.8, sea_color + (1.0 - sea_color) * close_to_sea, 1.0);
+        country_color = vec4(0);
+        board_pixel_id = uvec3(-1, -1, -1);
         return;
     }
+    
+    uint largest_country_index = -1;
+    float largest_country_value = 0;
+    for(int i = 0; i < 8; i++) {
+        float country_value = 0.5 + perlin_fbm(0.1 * tex_coord, 0.4, 3, seed + 1 + i);
+        if (country_value > largest_country_value) {
+            largest_country_value = country_value;
+            largest_country_index = i;
+        }
+    }
+
+    country_color = country_colors[largest_country_index];
+    board_pixel_id = uvec3(largest_country_index, -1, -1);
 
     // Color land more grean in humid areas
     terrain_color = vec4(h * (1.0 - hum), h * hum, h * (1.0 - hum), 1.0);
@@ -138,5 +159,5 @@ void render(vec2 tex_coord) {
 }
 
 void main() {
-    render(fragTexCoord*10.0f);
+    render(fragTexCoord*10.0f, gen_seed);
 }

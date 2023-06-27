@@ -24,5 +24,5 @@ void update_board_terrain(int seed) {
         country_colors[i] = (Vector4) { get_random_byte() / 255.0f, get_random_byte() / 255.0f, get_random_byte() / 255.0f, 1.0f };
     }
 
-    generate_board();
+    generate_board(seed);
 }
