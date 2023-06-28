@@ -30,6 +30,7 @@ void init_board_gen(void) {
 
 void generate_board(float seed) {
     SetShaderValueV(shader, GetShaderLocation(shader, "country_colors"), country_colors, SHADER_UNIFORM_VEC4, MAX_COUNTRIES_COUNT);
+    SetShaderValueV(shader, GetShaderLocation(shader, "country_centers"), country_centers, SHADER_UNIFORM_VEC2, MAX_COUNTRIES_COUNT);
     SetShaderValue(shader, GetShaderLocation(shader, "gen_seed"), &seed, SHADER_UNIFORM_FLOAT);
 
     // This needs to be done for some reason, otherwise other color channels will not output

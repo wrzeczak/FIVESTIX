@@ -1,8 +1,9 @@
 #version 420 core
 
 //! TODO: Use a texture sampler here instead? May be faster
-uniform vec4 country_colors[8];
 //! TODO: Use UBO
+uniform vec4 country_colors[8];
+uniform vec2 country_centers[8];
 uniform float gen_seed;
 
 in vec2 fragTexCoord;
@@ -142,13 +143,14 @@ void render(vec2 tex_coord, float seed) {
     
     //! TODO: Make the country generation better
     // Ideas:
-    // Each country will get a capital (we are gonna need it anyway) and that distance will be multiplied with the noise to prevent exclaves and stuff
     // Take the opposite approach to board generation, instead of putting countries on top of terrain, generate countries first and have the terrain follow
 
     uint largest_country_index = -1;
     float largest_country_value = 0;
     for(int i = 0; i < 8; i++) {
-        float country_value = 0.5 + perlin_fbm(0.1 * tex_coord, 0.4, 3, seed + 1 + i);
+        float distance_to_center = distance(tex_coord, 10.0f*country_centers[i]);
+
+        float country_value = (5 - distance_to_center) * (0.5 + perlin_fbm(0.1 * tex_coord, 0.4, 3, seed + 1 + i)) * (0.5 + perlin_fbm(0.1 * tex_coord, 0.4, 3, seed + 1 + i));
         if (country_value > largest_country_value) {
             largest_country_value = country_value;
             largest_country_index = i;

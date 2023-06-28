@@ -3,6 +3,7 @@
 #include <stdalign.h>
 
 _Alignas(64) Vector4 country_colors[MAX_COUNTRIES_COUNT];
+_Alignas(64) Vector2 country_centers[MAX_COUNTRIES_COUNT];
 
 _Alignas(64) const char * country_display_names[MAX_COUNTRIES_COUNT] = {
     "Country0",
