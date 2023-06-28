@@ -140,6 +140,11 @@ void render(vec2 tex_coord, float seed) {
         return;
     }
     
+    //! TODO: Make the country generation better
+    // Ideas:
+    // Each country will get a capital (we are gonna need it anyway) and that distance will be multiplied with the noise to prevent exclaves and stuff
+    // Take the opposite approach to board generation, instead of putting countries on top of terrain, generate countries first and have the terrain follow
+
     uint largest_country_index = -1;
     float largest_country_value = 0;
     for(int i = 0; i < 8; i++) {
